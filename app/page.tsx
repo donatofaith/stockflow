@@ -5,8 +5,9 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import {
   LAMPORTS_PER_SOL,
-  SystemProgram,
+  PublicKey,
   Transaction,
+  TransactionInstruction,
 } from "@solana/web3.js";
 
 import {
@@ -152,8 +153,9 @@ const DEFAULT_ALLOCATIONS: Allocation[] = [
   },
 ];
 
-const DEVNET_TEST_SOL =
-  0.000001;
+const MEMO_PROGRAM_ID = new PublicKey(
+  "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+);
 
 /* ======================================================
    HELPERS
@@ -206,6 +208,60 @@ function formatActivityTime(
       minute: "2-digit",
     }
   ).format(date);
+}
+
+function getErrorMessage(error: unknown) {
+  if (
+    error instanceof Error &&
+    error.message
+  ) {
+    return error.message;
+  }
+
+  if (
+    typeof error === "object" &&
+    error !== null
+  ) {
+    const record = error as Record<
+      string,
+      unknown
+    >;
+
+    if (
+      typeof record.message ===
+      "string"
+    ) {
+      return record.message;
+    }
+
+    if (
+      typeof record.error ===
+      "string"
+    ) {
+      return record.error;
+    }
+
+    if (
+      typeof record.cause ===
+      "object" &&
+      record.cause !== null
+    ) {
+      const cause =
+        record.cause as Record<
+          string,
+          unknown
+        >;
+
+      if (
+        typeof cause.message ===
+        "string"
+      ) {
+        return cause.message;
+      }
+    }
+  }
+
+  return "Unexpected wallet error.";
 }
 
 /* ======================================================
@@ -778,50 +834,52 @@ export default function Home() {
     );
 
     setDevnetStatus(
-      "Preparing Devnet transaction..."
+      "Preparing Devnet verification..."
     );
 
     try {
-      const lamports =
-        Math.max(
-          1,
-          Math.round(
-            DEVNET_TEST_SOL *
-              LAMPORTS_PER_SOL
-          )
-        );
-
       const latestBlockhash =
         await connection.getLatestBlockhash(
           "confirmed"
         );
 
       const transaction =
-        new Transaction({
-          feePayer:
-            publicKey,
+        new Transaction();
 
-          blockhash:
-            latestBlockhash.blockhash,
+      transaction.feePayer =
+        publicKey;
 
-          lastValidBlockHeight:
-            latestBlockhash.lastValidBlockHeight,
-        }).add(
-          SystemProgram.transfer(
+      transaction.recentBlockhash =
+        latestBlockhash.blockhash;
+
+      const memoText =
+        `StockFlow Devnet verification | ${simulationAmount.toFixed(
+          2
+        )} USDC | ${new Date().toISOString()}`;
+
+      transaction.add(
+        new TransactionInstruction({
+          keys: [
             {
-              fromPubkey:
+              pubkey:
                 publicKey,
-
-              toPubkey:
-                publicKey,
-
-              lamports,
-            }
-          )
-        );
+              isSigner:
+                true,
+              isWritable:
+                false,
+            },
+          ],
+          programId:
+            MEMO_PROGRAM_ID,
+          data:
+            new TextEncoder().encode(
+              memoText
+            ) as any,
+        })
+      );
 
       setDevnetStatus(
-        "Approve the transaction in your wallet."
+        "Approve the Devnet verification in your wallet."
       );
 
       const signature =
@@ -831,24 +889,23 @@ export default function Home() {
           {
             skipPreflight:
               false,
-
             preflightCommitment:
               "confirmed",
+            maxRetries:
+              3,
           }
         );
 
       setDevnetStatus(
-        "Transaction submitted..."
+        "Verification submitted. Waiting for confirmation..."
       );
 
       const confirmation =
         await connection.confirmTransaction(
           {
             signature,
-
             blockhash:
               latestBlockhash.blockhash,
-
             lastValidBlockHeight:
               latestBlockhash.lastValidBlockHeight,
           },
@@ -859,7 +916,7 @@ export default function Home() {
         confirmation.value.err
       ) {
         throw new Error(
-          "Transaction could not be confirmed."
+          "The Devnet verification was submitted but could not be confirmed."
         );
       }
 
@@ -873,14 +930,14 @@ export default function Home() {
         description:
           `${simulationAmount.toFixed(
             2
-          )} USDC allocation flow tested successfully on Solana Devnet.`,
+          )} USDC allocation flow verified successfully on Solana Devnet.`,
 
         status:
           "success",
       });
 
       setDevnetStatus(
-        "Transaction confirmed."
+        "Verification confirmed."
       );
 
       setToast(
@@ -888,12 +945,6 @@ export default function Home() {
       );
 
       await loadDevnetBalance();
-
-      /*
-        Once execution is confirmed,
-        the test interface closes
-        automatically.
-      */
 
       window.setTimeout(
         () => {
@@ -915,20 +966,14 @@ export default function Home() {
       error
     ) {
       console.error(
-        "Devnet transaction failed:",
+        "Devnet verification failed:",
         error
       );
 
       let message =
-        "Transaction failed.";
-
-      if (
-        error instanceof
-        Error
-      ) {
-        message =
-          error.message;
-      }
+        getErrorMessage(
+          error
+        );
 
       const lowerMessage =
         message.toLowerCase();
@@ -939,10 +984,38 @@ export default function Home() {
         ) ||
         lowerMessage.includes(
           "rejected"
+        ) ||
+        lowerMessage.includes(
+          "cancelled"
+        ) ||
+        lowerMessage.includes(
+          "canceled"
         )
       ) {
         message =
           "Transaction cancelled in wallet.";
+      } else if (
+        lowerMessage.includes(
+          "blockhash"
+        )
+      ) {
+        message =
+          "The Devnet request expired. Please run it again.";
+      } else if (
+        lowerMessage.includes(
+          "insufficient"
+        )
+      ) {
+        message =
+          "Not enough Devnet SOL to pay the network fee.";
+      } else if (
+        lowerMessage ===
+          "unexpected error" ||
+        lowerMessage ===
+          "unexpected wallet error."
+      ) {
+        message =
+          "The wallet could not complete the Devnet verification. Please make sure Phantom is still on Solana Devnet, then try again.";
       }
 
       setDevnetError(
@@ -3008,9 +3081,9 @@ export default function Home() {
 
                       <p className="mt-1 max-w-md text-[10px] leading-5 text-white/35">
                         Confirm the
-                        transaction in your
+                        verification in your
                         connected wallet to
-                        verify the
+                        validate the
                         allocation flow.
                       </p>
                     </div>

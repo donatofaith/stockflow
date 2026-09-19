@@ -24,6 +24,7 @@ const PRICE_KEYS = new Set([
   "marketPrice",
   "nasdaqPrice",
   "regularMarketPrice",
+  "lastSalePrice",
   "close",
   "last",
   "value",
@@ -35,7 +36,8 @@ function toPrice(value: unknown): number | null {
   }
 
   if (typeof value === "string") {
-    const parsed = Number(value.replace(/,/g, ""));
+    const cleaned = value.replace(/[$,\s]/g, "");
+    const parsed = Number(cleaned);
 
     if (Number.isFinite(parsed) && parsed > 0) {
       return parsed;
@@ -45,66 +47,76 @@ function toPrice(value: unknown): number | null {
   return null;
 }
 
-function extractPrice(value: unknown): number | null {
+function extractPrice(value: unknown, depth = 0): number | null {
+  if (depth > 8) return null;
+
+  const direct = toPrice(value);
+  if (direct !== null) return direct;
+
   if (!value || typeof value !== "object") {
-    return toPrice(value);
+    return null;
   }
 
   if (Array.isArray(value)) {
     for (const item of value) {
-      const price = extractPrice(item);
-
-      if (price !== null) {
-        return price;
-      }
+      const price = extractPrice(item, depth + 1);
+      if (price !== null) return price;
     }
-
     return null;
   }
 
   const record = value as Record<string, unknown>;
 
-  // Prefer fields that are explicitly price-like before walking nested objects.
   for (const [key, candidate] of Object.entries(record)) {
     if (PRICE_KEYS.has(key)) {
       const price = toPrice(candidate);
-
-      if (price !== null) {
-        return price;
-      }
+      if (price !== null) return price;
     }
   }
 
   for (const nestedValue of Object.values(record)) {
     if (nestedValue && typeof nestedValue === "object") {
-      const price = extractPrice(nestedValue);
-
-      if (price !== null) {
-        return price;
-      }
+      const price = extractPrice(nestedValue, depth + 1);
+      if (price !== null) return price;
     }
   }
 
   return null;
 }
 
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit = {},
+  timeoutMs = 6000
+) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: controller.signal,
+      cache: "no-store",
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function fetchXStocksPrice(ticker: string) {
   for (const base of XSTOCKS_API_BASES) {
     try {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `${base}/public/assets/${encodeURIComponent(ticker)}/price-data`,
         {
           headers: {
             Accept: "application/json",
             "User-Agent": "StockFlow/1.0",
           },
-          cache: "no-store",
         }
       );
 
-      if (!response.ok) {
-        continue;
-      }
+      if (!response.ok) continue;
 
       const json = await response.json();
       const price = extractPrice(json);
@@ -116,77 +128,113 @@ async function fetchXStocksPrice(ticker: string) {
         };
       }
     } catch (error) {
-      console.error(`xStocks price lookup failed for ${ticker}:`, error);
+      console.error(`xStocks lookup failed for ${ticker}:`, error);
     }
   }
 
   return null;
 }
 
-async function fetchYahooPrice(symbol: string) {
-  const urls = [
-    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
-      symbol
-    )}?range=1d&interval=5m`,
-    `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
-      symbol
-    )}?range=1d&interval=5m`,
-  ];
-
-  for (const url of urls) {
-    try {
-      const response = await fetch(url, {
+async function fetchNasdaqPrice(symbol: string) {
+  try {
+    const response = await fetchWithTimeout(
+      `https://api.nasdaq.com/api/quote/${encodeURIComponent(
+        symbol
+      )}/info?assetclass=stocks`,
+      {
         headers: {
-          Accept: "application/json",
+          Accept: "application/json, text/plain, */*",
+          "Accept-Language": "en-US,en;q=0.9",
           "User-Agent":
-            "Mozilla/5.0 (compatible; StockFlow/1.0; +https://github.com/donatofaith/stockflow)",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/153 Safari/537.36",
+          Referer: "https://www.nasdaq.com/",
+          Origin: "https://www.nasdaq.com",
         },
-        cache: "no-store",
-      });
-
-      if (!response.ok) {
-        continue;
       }
+    );
 
-      const json = await response.json();
-      const result = json?.chart?.result?.[0];
+    if (!response.ok) return null;
 
-      const candidates = [
-        result?.meta?.regularMarketPrice,
-        result?.meta?.previousClose,
-        result?.indicators?.quote?.[0]?.close
-          ?.filter((value: unknown) => typeof value === "number")
-          ?.at(-1),
-      ];
+    const json = await response.json();
 
-      for (const candidate of candidates) {
-        const price = toPrice(candidate);
+    const candidates = [
+      json?.data?.primaryData?.lastSalePrice,
+      json?.data?.secondaryData?.lastSalePrice,
+      json?.data?.summaryData?.PreviousClose?.value,
+    ];
 
-        if (price !== null) {
-          return {
-            price,
-            source: "Underlying market",
-          };
-        }
+    for (const candidate of candidates) {
+      const price = toPrice(candidate);
+
+      if (price !== null) {
+        return {
+          price,
+          source: "Nasdaq",
+        };
       }
-    } catch (error) {
-      console.error(`Fallback price lookup failed for ${symbol}:`, error);
     }
+  } catch (error) {
+    console.error(`Nasdaq lookup failed for ${symbol}:`, error);
+  }
+
+  return null;
+}
+
+async function fetchStooqPrice(symbol: string) {
+  try {
+    const response = await fetchWithTimeout(
+      `https://stooq.com/q/l/?s=${encodeURIComponent(
+        symbol.toLowerCase()
+      )}.us&f=sd2t2ohlcv&h&e=csv`,
+      {
+        headers: {
+          Accept: "text/csv,text/plain,*/*",
+          "User-Agent": "StockFlow/1.0",
+        },
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const csv = await response.text();
+    const lines = csv.trim().split(/\r?\n/);
+
+    if (lines.length < 2) return null;
+
+    const headers = lines[0].split(",");
+    const values = lines[1].split(",");
+    const closeIndex = headers.findIndex(
+      (header) => header.trim().toLowerCase() === "close"
+    );
+
+    if (closeIndex < 0) return null;
+
+    const price = toPrice(values[closeIndex]);
+
+    if (price !== null) {
+      return {
+        price,
+        source: "Stooq",
+      };
+    }
+  } catch (error) {
+    console.error(`Stooq lookup failed for ${symbol}:`, error);
   }
 
   return null;
 }
 
 async function fetchAssetPrice(ticker: string, underlying: string) {
-  const xStocksPrice = await fetchXStocksPrice(ticker);
+  const xStocks = await fetchXStocksPrice(ticker);
+  if (xStocks) return xStocks;
 
-  if (xStocksPrice) {
-    return xStocksPrice;
-  }
+  const nasdaq = await fetchNasdaqPrice(underlying);
+  if (nasdaq) return nasdaq;
 
-  // If the xStocks feed is temporarily unavailable, use the underlying
-  // stock market price so the product can still show a useful estimate.
-  return fetchYahooPrice(underlying);
+  const stooq = await fetchStooqPrice(underlying);
+  if (stooq) return stooq;
+
+  return null;
 }
 
 export async function GET() {
@@ -213,7 +261,8 @@ export async function GET() {
     },
     {
       headers: {
-        "Cache-Control": "no-store, max-age=0",
+        "Cache-Control":
+          "no-store, no-cache, must-revalidate, proxy-revalidate",
       },
     }
   );

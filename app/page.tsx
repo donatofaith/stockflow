@@ -157,6 +157,9 @@ const MEMO_PROGRAM_ID = new PublicKey(
   "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
 );
 
+const MARKET_CACHE_KEY =
+  "stockflow-market-prices-v1";
+
 /* ======================================================
    HELPERS
 ====================================================== */
@@ -576,6 +579,47 @@ export default function Home() {
   ==================================================== */
 
   useEffect(() => {
+    /*
+      Hydrate the ticker immediately from the
+      last successful market response. This
+      prevents returning users from seeing
+      "Unavailable" while the fresh request is
+      still loading.
+    */
+    try {
+      const cached =
+        window.localStorage.getItem(
+          MARKET_CACHE_KEY
+        );
+
+      if (cached) {
+        const parsed =
+          JSON.parse(cached) as {
+            assets?: Market[];
+            updatedAt?: string | null;
+          };
+
+        if (
+          Array.isArray(
+            parsed.assets
+          )
+        ) {
+          setMarkets(
+            parsed.assets
+          );
+
+          setMarketUpdatedAt(
+            parsed.updatedAt ??
+              null
+          );
+        }
+      }
+    } catch {
+      window.localStorage.removeItem(
+        MARKET_CACHE_KEY
+      );
+    }
+
     loadMarkets();
 
     const interval =
@@ -762,37 +806,64 @@ export default function Home() {
         )
       ) {
         setMarkets(
-          (currentMarkets) =>
-            data.assets.map(
-              (
-                incoming: Market
-              ) => {
-                const previous =
-                  currentMarkets.find(
-                    (
-                      market
-                    ) =>
-                      market.ticker ===
-                      incoming.ticker
-                  );
+          (currentMarkets) => {
+            const merged =
+              data.assets.map(
+                (
+                  incoming: Market
+                ) => {
+                  const previous =
+                    currentMarkets.find(
+                      (
+                        market
+                      ) =>
+                        market.ticker ===
+                        incoming.ticker
+                    );
 
-                return {
-                  ...incoming,
+                  return {
+                    ...incoming,
 
-                  /*
-                    Never replace a valid
-                    price already on screen
-                    with null just because
-                    a later provider refresh
-                    temporarily failed.
-                  */
-                  price:
-                    incoming.price ??
-                    previous?.price ??
-                    null,
-                };
+                    /*
+                      Keep the last successful
+                      price if a provider refresh
+                      temporarily returns null.
+                    */
+                    price:
+                      incoming.price ??
+                      previous?.price ??
+                      null,
+                  };
+                }
+              );
+
+            if (
+              merged.some(
+                (
+                  asset: Market
+                ) =>
+                  asset.price !==
+                  null
+              )
+            ) {
+              try {
+                window.localStorage.setItem(
+                  MARKET_CACHE_KEY,
+                  JSON.stringify({
+                    assets:
+                      merged,
+                    updatedAt:
+                      data.updatedAt ??
+                      new Date().toISOString(),
+                  })
+                );
+              } catch {
+                // Market caching is optional.
               }
-            )
+            }
+
+            return merged;
+          }
         );
 
         if (

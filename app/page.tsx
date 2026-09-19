@@ -762,19 +762,63 @@ export default function Home() {
         )
       ) {
         setMarkets(
-          data.assets
-        );
-      }
+          (currentMarkets) =>
+            data.assets.map(
+              (
+                incoming: Market
+              ) => {
+                const previous =
+                  currentMarkets.find(
+                    (
+                      market
+                    ) =>
+                      market.ticker ===
+                      incoming.ticker
+                  );
 
-      setMarketUpdatedAt(
-        data.updatedAt ??
-          null
-      );
+                return {
+                  ...incoming,
+
+                  /*
+                    Never replace a valid
+                    price already on screen
+                    with null just because
+                    a later provider refresh
+                    temporarily failed.
+                  */
+                  price:
+                    incoming.price ??
+                    previous?.price ??
+                    null,
+                };
+              }
+            )
+        );
+
+        if (
+          data.assets.some(
+            (
+              asset: Market
+            ) =>
+              asset.price !==
+              null
+          )
+        ) {
+          setMarketUpdatedAt(
+            data.updatedAt ??
+              new Date().toISOString()
+          );
+        }
+      }
     } catch (
       error
     ) {
+      /*
+        Keep the last successful prices
+        visible if a refresh fails.
+      */
       console.error(
-        "Failed to load xStocks market data:",
+        "Failed to refresh market data:",
         error
       );
     }

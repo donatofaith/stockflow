@@ -16,12 +16,6 @@ if (!supabasePublishableKey) {
   );
 }
 
-console.log("Supabase URL loaded:", supabaseUrl);
-console.log(
-  "Supabase key loaded:",
-  supabasePublishableKey.slice(0, 15) + "..."
-);
-
 export const supabase = createClient(
   supabaseUrl,
   supabasePublishableKey

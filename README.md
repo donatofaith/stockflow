@@ -8,6 +8,24 @@ Built for **Stocklana on Solana**.
 
 [Live demo](https://stockflow-nine-indol.vercel.app) · [Architecture](docs/ARCHITECTURE.md) · [Security notes](SECURITY.md)
 
+## Product preview
+
+### Landing page
+
+![StockFlow landing page](docs/images/stockflow-home.png)
+
+### Build and review an allocation rule
+
+| Trigger | Allocation builder |
+| --- | --- |
+| ![Choose the USDC trigger](docs/images/stockflow-rule-trigger.png) | ![Build an xStocks allocation](docs/images/stockflow-allocation-builder.png) |
+
+![Review the active allocation rule](docs/images/stockflow-rule-review.png)
+
+### Verify the flow on Solana Devnet
+
+![StockFlow Devnet verification](docs/images/stockflow-devnet-test.png)
+
 ## The problem
 
 Investors who regularly receive stablecoins must repeatedly decide what to buy and manually split every deposit. That process is slow, inconsistent, and difficult to verify before funds move.

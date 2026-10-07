@@ -1771,17 +1771,17 @@ export default function Home() {
 
           <div className="hidden items-center gap-9 rounded-full border border-white/[0.08] bg-white/[0.025] px-7 py-3 text-sm text-white/60 backdrop-blur-xl lg:flex">
             <a
-              href="#markets"
+              href="#how"
               className="nav-link"
             >
               Markets
             </a>
 
             <a
-              href="#how"
+              href="#activity"
               className="nav-link"
             >
-              How it works
+              My flow
             </a>
 
             <a
@@ -1816,19 +1816,15 @@ export default function Home() {
           </div>
 
           <h1 className="mt-8 max-w-[950px] text-[3.2rem] font-medium leading-[0.98] tracking-[-0.065em] sm:text-[4.4rem] md:text-[5.6rem] lg:text-[6.8rem]">
-            Investing that moves
+            Invest automatically.
 
             <span className="hero-title-gradient block">
-              with your money.
+              Your money follows your rules.
             </span>
           </h1>
 
           <p className="mt-7 max-w-[620px] text-[15px] leading-7 text-white/45 sm:text-base">
-            Create automatic investment
-            rules for tokenized stocks on
-            Solana. Receive USDC, choose
-            your allocations, and verify
-            your flow safely on Devnet.
+            Decide once how your money should be invested. When USDC arrives, StockFlow follows your allocation rule.
           </p>
 
           {connected && (
@@ -1909,7 +1905,7 @@ export default function Home() {
                 }
                 className="secondary-button"
               >
-                Test Rule
+                Preview Flow
 
                 <Calculator
                   size={
@@ -1922,7 +1918,7 @@ export default function Home() {
                 href="#how"
                 className="secondary-button"
               >
-                Explore StockFlow
+                See how it works
 
                 <Sparkles
                   size={
@@ -2061,19 +2057,15 @@ export default function Home() {
             </div>
 
             <h2 className="mt-6 max-w-xl text-4xl font-medium leading-[1.05] tracking-[-0.05em] sm:text-5xl lg:text-6xl">
-              Your money arrives.
+              Set your rule once.
 
               <span className="block text-white/35">
-                StockFlow puts it to work.
+                Your money knows where to go.
               </span>
             </h2>
 
             <p className="mt-6 max-w-lg text-sm leading-7 text-white/40 sm:text-base">
-              Build an allocation rule,
-              simulate an incoming USDC
-              deposit, and verify wallet
-              execution safely on Solana
-              Devnet.
+              Choose your investments and percentages. When money arrives, your rule decides how it should be divided.
             </p>
           </div>
 
@@ -2166,7 +2158,7 @@ export default function Home() {
               className="mt-7 w-full rounded-2xl bg-white py-4 text-sm font-semibold text-black transition hover:bg-white/90"
             >
               {isActive
-                ? "Run Active Rule"
+                ? "Preview My Flow"
                 : savedRule
                   ? "Continue Draft"
                   : "Create My Rule"}
@@ -3001,11 +2993,11 @@ export default function Home() {
                 <div className="rule-builder-top">
                   <div>
                     <p className="rule-kicker">
-                      StockFlow execution
+                      Preview flow
                     </p>
 
                     <h2>
-                      Run your allocation
+                      See where your money goes
                     </h2>
 
                     <div className="simulation-demo-badge">
@@ -3031,10 +3023,7 @@ export default function Home() {
                 </div>
 
                 <p className="rule-step-description">
-                  Enter the incoming USDC
-                  amount to see how your
-                  active allocation will
-                  be distributed.
+                  Enter an incoming USDC amount and StockFlow will show exactly how your rule divides it.
                 </p>
 
                 {/* AMOUNT */}

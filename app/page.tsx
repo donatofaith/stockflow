@@ -1920,6 +1920,43 @@ export default function Home() {
             )}
           </div>
 
+      {/* LIVE XSTOCKS STRIP */}
+
+      <section
+        aria-label="Live supported xStocks"
+        className="market-strip mt-8 w-screen border-y border-white/[0.06] bg-black/25"
+      >
+        <div className="mx-auto flex max-w-[1440px] items-center gap-6 px-5 py-5 md:px-10 lg:px-16">
+          <div className="market-strip-label shrink-0">
+            <span className="market-live-dot" />
+            Live xStocks
+          </div>
+
+          <div className="market-strip-viewport">
+            <div className="market-strip-track">
+              {scrollingMarkets.map((market, index) => (
+                <div
+                  key={`${market.ticker}-${index}`}
+                  className="market-strip-item"
+                  aria-hidden={index >= markets.length}
+                >
+                  <span className="market-strip-ticker">{market.ticker}</span>
+                  <span className="market-strip-price">
+                    {market.price === null ? "Price unavailable" : formatPrice(market.price)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {marketUpdatedAt && (
+            <span className="hidden shrink-0 text-[11px] font-medium text-white/30 xl:block">
+              Live prices
+            </span>
+          )}
+        </div>
+      </section>
+
           <div className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-xs text-white/35">
             <span className="flex items-center gap-2">
               <ShieldCheck
@@ -2014,43 +2051,6 @@ export default function Home() {
 
 
           </div>
-        </div>
-      </section>
-
-      {/* LIVE XSTOCKS STRIP */}
-
-      <section
-        aria-label="Live supported xStocks"
-        className="market-strip border-y border-white/[0.05] bg-black/20"
-      >
-        <div className="mx-auto flex max-w-[1440px] items-center gap-4 px-5 py-3 md:px-10 lg:px-16">
-          <div className="market-strip-label shrink-0">
-            <span className="market-live-dot" />
-            Live xStocks
-          </div>
-
-          <div className="market-strip-viewport">
-            <div className="market-strip-track">
-              {scrollingMarkets.map((market, index) => (
-                <div
-                  key={`${market.ticker}-${index}`}
-                  className="market-strip-item"
-                  aria-hidden={index >= markets.length}
-                >
-                  <span className="market-strip-ticker">{market.ticker}</span>
-                  <span className="market-strip-price">
-                    {market.price === null ? "Price unavailable" : formatPrice(market.price)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {marketUpdatedAt && (
-            <span className="hidden shrink-0 text-[9px] text-white/20 xl:block">
-              Live prices
-            </span>
-          )}
         </div>
       </section>
 

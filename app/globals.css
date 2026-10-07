@@ -403,7 +403,7 @@ button {
   background: rgba(51, 209, 131, 0.08);
   padding: 6px 9px;
   color: #75e8ad;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -2425,8 +2425,8 @@ button {
 }
 
 .simulation-demo-badge span {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 
   border-radius: 50%;
 
@@ -2632,30 +2632,31 @@ button {
   display: flex;
   width: max-content;
   align-items: center;
-  animation: stockflow-market-scroll 42s linear infinite;
+  animation: stockflow-market-scroll 48s linear infinite;
   will-change: transform;
 }
 
 .market-strip-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 18px;
+  gap: 10px;
+  padding: 0 26px;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   white-space: nowrap;
 }
 
 .market-strip-ticker {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.68);
+  letter-spacing: 0.035em;
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .market-strip-price {
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.48);
 }
 
 @keyframes stockflow-market-scroll {

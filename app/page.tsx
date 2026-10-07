@@ -1763,7 +1763,7 @@ export default function Home() {
               href="#how"
               className="nav-link"
             >
-              Markets
+              How it works
             </a>
 
             <a

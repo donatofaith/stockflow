@@ -76,7 +76,6 @@ Any percentage not assigned to an xStock remains available as USDC.
 - My Flow view for the saved rule and recent demo activity
 - Optional Solana Devnet verification
 - Cached market prices and local activity history
-- Jupiter route-preview API foundation
 - Responsive interface
 
 ## Architecture
@@ -88,7 +87,6 @@ flowchart TD
     W --> D["Solana Devnet memo"]
     W --> P["StockFlow API routes"]
     P --> X["xStocks / market data"]
-    P --> J["Jupiter APIs"]
 ```
 
 The browser owns the interactive wallet experience. Next.js route handlers proxy external market and routing services so server-only configuration stays off the client. Supabase stores allocation rules, while local storage provides a prototype fallback and activity history.
@@ -98,14 +96,12 @@ The browser owns the interactive wallet experience. Next.js route handlers proxy
 | Method | Route | Purpose |
 | --- | --- | --- |
 | `GET` | `/api/xstocks` | Returns supported assets and normalized prices |
-| `POST` | `/api/jupiter-preview` | Checks route availability without signing or submitting a transaction |
 
 ## Tech stack
 
 - Next.js 16, React 19, TypeScript
 - Solana Web3.js and Wallet Adapter
 - Supabase
-- Jupiter APIs
 - xStocks, Nasdaq, and Stooq market-data sources
 - Framer Motion and Tailwind CSS
 - Vercel
@@ -118,7 +114,6 @@ The browser owns the interactive wallet experience. Next.js route handlers proxy
 - npm
 - A Supabase project
 - A Solana wallet for the optional Devnet verification
-- A Jupiter API key for route previews
 
 ### Install
 
@@ -137,7 +132,6 @@ Open `http://localhost:3000`.
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-JUPITER_API_KEY=
 ```
 
 The Supabase publishable key is intended for browser use. Never place a Supabase service-role key or wallet secret in a `NEXT_PUBLIC_*` variable.
@@ -154,7 +148,6 @@ npm run build
 - Activating a flow saves a user preference; it does not start autonomous trading.
 - Preview Flow is a calculation only; no investment funds are moved.
 - Devnet verification uses a Solana memo transaction.
-- Jupiter integration currently prepares route information only; signing and execution are disabled.
 - Market prices may be delayed or unavailable when third-party services are unreachable.
 - Production use would require additional authentication, security review, and restrictive Supabase Row Level Security policies.
 

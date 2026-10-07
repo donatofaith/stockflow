@@ -2174,17 +2174,15 @@ export default function Home() {
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
               <div className="section-tag">
-                Activity
+                My Flow
               </div>
 
               <h2 className="mt-5 text-4xl font-medium tracking-[-0.05em] sm:text-5xl">
-                Your StockFlow activity
+                Your rule. One simple view.
               </h2>
 
               <p className="mt-4 max-w-xl text-sm leading-7 text-white/40">
-                Your current allocation
-                and recent activity for
-                this connected wallet.
+                See how incoming USDC would be divided and what has happened recently.
               </p>
             </div>
 
@@ -2215,7 +2213,7 @@ export default function Home() {
               </p>
             </div>
           ) : (
-            <div className="mt-10 grid gap-4 lg:grid-cols-[0.95fr_1.4fr]">
+            <div className="mt-10 space-y-4">
               {/* CURRENT RULE */}
 
               <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-5">
@@ -2227,7 +2225,7 @@ export default function Home() {
                       }
                     />
 
-                    Current allocation
+                    My active flow
                   </div>
 
                   <span
@@ -2247,7 +2245,19 @@ export default function Home() {
 
                 {savedRule ? (
                   <>
-                    <div className="mt-6 space-y-2">
+                    <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/[0.05] bg-black/20 px-4 py-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.03] text-xs font-semibold">
+                        U
+                      </div>
+                      <div>
+                        <span className="block text-[9px] uppercase tracking-[0.12em] text-white/25">When I receive</span>
+                        <strong className="mt-1 block text-xs">USDC</strong>
+                      </div>
+                      <ArrowRight className="ml-auto text-white/20" size={16} />
+                      <span className="text-[10px] text-white/35">Follow my rule</span>
+                    </div>
+
+                    <div className="mt-3 space-y-2">
                       {savedRule.allocations
                         .filter(
                           (
@@ -2312,11 +2322,11 @@ export default function Home() {
                           ? openSimulator
                           : openBuilder
                       }
-                      className="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold text-white/60 transition hover:text-white"
+                      className="primary-button mt-5"
                     >
                       {isActive
-                        ? "Run allocation"
-                        : "Continue rule"}
+                        ? "Preview my flow"
+                        : "Finish my flow"}
 
                       <ArrowRight
                         size={
@@ -2328,18 +2338,16 @@ export default function Home() {
                 ) : (
                   <div className="mt-8">
                     <p className="text-xs leading-6 text-white/30">
-                      You have not created
-                      an allocation rule
-                      with this wallet yet.
+                      You do not have a flow yet. Create one rule for how incoming USDC should be divided.
                     </p>
 
                     <button
                       onClick={
                         openBuilder
                       }
-                      className="mt-4 inline-flex items-center gap-2 text-[10px] font-semibold text-white/60"
+                      className="primary-button mt-5"
                     >
-                      Create rule
+                      Create my flow
 
                       <ArrowRight
                         size={
@@ -2353,7 +2361,7 @@ export default function Home() {
 
               {/* RECENT ACTIVITY */}
 
-              <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-5">
+              <div className="rounded-[24px] border border-white/[0.05] bg-white/[0.012] p-5">
                 <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.12em] text-white/30">
                   <History
                     size={

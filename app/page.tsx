@@ -437,7 +437,7 @@ export default function Home() {
       walletAddress,
     ]);
 
-  const totalInvested =
+  const totalInvest =
     useMemo(() => {
       return allocations.reduce(
         (
@@ -454,7 +454,7 @@ export default function Home() {
 
   const remaining =
     100 -
-    totalInvested;
+    totalInvest;
 
   const isActive =
     savedRule?.status ===
@@ -1270,7 +1270,7 @@ export default function Home() {
       );
     }
 
-    setStep(1);
+    setStep(2);
 
     setBuilderOpen(
       true
@@ -1406,9 +1406,9 @@ export default function Home() {
     }
 
     if (
-      totalInvested <=
+      totalInvest <=
         0 ||
-      totalInvested >
+      totalInvest >
         100
     ) {
       setToast(
@@ -1516,9 +1516,9 @@ export default function Home() {
     }
 
     if (
-      totalInvested <=
+      totalInvest <=
         0 ||
-      totalInvested >
+      totalInvest >
         100
     ) {
       setToast(
@@ -1771,17 +1771,17 @@ export default function Home() {
 
           <div className="hidden items-center gap-9 rounded-full border border-white/[0.08] bg-white/[0.025] px-7 py-3 text-sm text-white/60 backdrop-blur-xl lg:flex">
             <a
-              href="#markets"
+              href="#how"
               className="nav-link"
             >
               Markets
             </a>
 
             <a
-              href="#how"
+              href="#activity"
               className="nav-link"
             >
-              How it works
+              My flow
             </a>
 
             <a
@@ -1816,19 +1816,15 @@ export default function Home() {
           </div>
 
           <h1 className="mt-8 max-w-[950px] text-[3.2rem] font-medium leading-[0.98] tracking-[-0.065em] sm:text-[4.4rem] md:text-[5.6rem] lg:text-[6.8rem]">
-            Investing that moves
+            Invest automatically.
 
             <span className="hero-title-gradient block">
-              with your money.
+              Your money follows your rules.
             </span>
           </h1>
 
           <p className="mt-7 max-w-[620px] text-[15px] leading-7 text-white/45 sm:text-base">
-            Create automatic investment
-            rules for tokenized stocks on
-            Solana. Receive USDC, choose
-            your allocations, and verify
-            your flow safely on Devnet.
+            Decide once how your money should be invested. When USDC arrives, StockFlow follows your allocation rule.
           </p>
 
           {connected && (
@@ -1909,7 +1905,7 @@ export default function Home() {
                 }
                 className="secondary-button"
               >
-                Test Rule
+                Preview Flow
 
                 <Calculator
                   size={
@@ -1922,7 +1918,7 @@ export default function Home() {
                 href="#how"
                 className="secondary-button"
               >
-                Explore StockFlow
+                See how it works
 
                 <Sparkles
                   size={
@@ -1966,79 +1962,74 @@ export default function Home() {
           </div>
         </div>
 
-        {/* MARKET TICKER */}
+        {/* PRODUCT DEMO */}
 
-        <div
-          id="markets"
-          className="relative z-20 w-full border-t border-white/[0.05] py-5"
-        >
-          <div className="market-marquee-wrapper">
-            <div className="market-marquee">
-              {scrollingMarkets.map(
-                (
-                  market,
-                  index
-                ) => (
-                  <div
-                    key={`${market.ticker}-${index}`}
-                    className="market-card market-card-scroll"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <div className="coin-icon">
-                            {market.ticker.slice(
-                              0,
-                              1
-                            )}
-                          </div>
+        <div className="relative z-20 mx-auto w-full max-w-[980px] px-5 pb-20 pt-5 md:px-10">
+          <div className="overflow-hidden rounded-[30px] border border-white/[0.08] bg-white/[0.035] p-5 text-left shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7">
+            <div className="flex flex-col gap-4 border-b border-white/[0.06] pb-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/30">
+                  Your flow
+                </p>
+                <h2 className="mt-2 text-lg font-semibold tracking-[-0.03em] sm:text-xl">
+                  When money arrives, follow my rule.
+                </h2>
+              </div>
 
-                          <div>
-                            <p className="text-sm font-medium">
-                              {
-                                market.name
-                              }
-                            </p>
+              <span className="w-fit rounded-full border border-emerald-400/10 bg-emerald-400/[0.06] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-emerald-300">
+                Example rule
+              </span>
+            </div>
 
-                            <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-white/30">
-                              {
-                                market.ticker
-                              }
-                            </p>
-                          </div>
-                        </div>
+            <div className="grid gap-3 py-5 sm:grid-cols-[1fr_auto_1.45fr] sm:items-center">
+              <div className="rounded-2xl border border-white/[0.07] bg-black/25 p-4">
+                <p className="text-[9px] uppercase tracking-[0.14em] text-white/30">
+                  When I receive
+                </p>
+                <div className="mt-3 flex items-baseline justify-between gap-3">
+                  <strong className="text-xl tracking-[-0.03em]">100</strong>
+                  <span className="text-xs font-medium text-white/45">USDC</span>
+                </div>
+              </div>
 
-                        <p className="mt-6 text-xl font-medium tracking-[-0.03em]">
-                          {formatPrice(
-                            market.price
-                          )}
-                        </p>
-                      </div>
+              <ArrowRight className="mx-auto rotate-90 text-white/20 sm:rotate-0" size={20} />
 
-                      <div className="market-change">
-                        {market.price ===
-                        null
-                          ? "..."
-                          : "LIVE"}
-                      </div>
-                    </div>
-
-                    <div className="mt-6 h-px w-full bg-white/[0.06]" />
-
-                    <div className="mt-3 flex justify-between text-[10px] text-white/25">
-                      <span>
-                        xSTOCKS PRICE
-                      </span>
-
-                      <span>
-                        {marketUpdatedAt
-                          ? "UPDATED"
-                          : "LOADING"}
-                      </span>
-                    </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-black/20 px-4 py-3">
+                  <div>
+                    <span className="block text-sm font-semibold">Apple</span>
+                    <span className="mt-0.5 block text-[9px] text-white/30">AAPLx</span>
                   </div>
-                )
-              )}
+                  <strong className="text-sm">50%</strong>
+                </div>
+
+                <div className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-black/20 px-4 py-3">
+                  <div>
+                    <span className="block text-sm font-semibold">NVIDIA</span>
+                    <span className="mt-0.5 block text-[9px] text-white/30">NVDAx</span>
+                  </div>
+                  <strong className="text-sm">30%</strong>
+                </div>
+
+                <div className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-black/20 px-4 py-3">
+                  <div>
+                    <span className="block text-sm font-semibold">Keep available</span>
+                    <span className="mt-0.5 block text-[9px] text-white/30">USDC</span>
+                  </div>
+                  <strong className="text-sm">20%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-white/[0.06] pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-lg text-xs leading-6 text-white/35">
+                You choose the rule. StockFlow shows exactly how each incoming amount would be divided before anything is confirmed.
+              </p>
+
+              <button onClick={openBuilder} className="primary-button shrink-0">
+                {connected ? "Create my flow" : "Connect & create"}
+                <ArrowRight size={16} />
+              </button>
             </div>
           </div>
         </div>
@@ -2061,19 +2052,15 @@ export default function Home() {
             </div>
 
             <h2 className="mt-6 max-w-xl text-4xl font-medium leading-[1.05] tracking-[-0.05em] sm:text-5xl lg:text-6xl">
-              Your money arrives.
+              Set your rule once.
 
               <span className="block text-white/35">
-                StockFlow puts it to work.
+                Your money knows where to go.
               </span>
             </h2>
 
             <p className="mt-6 max-w-lg text-sm leading-7 text-white/40 sm:text-base">
-              Build an allocation rule,
-              simulate an incoming USDC
-              deposit, and verify wallet
-              execution safely on Solana
-              Devnet.
+              Choose your investments and percentages. When money arrives, your rule decides how it should be divided.
             </p>
           </div>
 
@@ -2166,7 +2153,7 @@ export default function Home() {
               className="mt-7 w-full rounded-2xl bg-white py-4 text-sm font-semibold text-black transition hover:bg-white/90"
             >
               {isActive
-                ? "Run Active Rule"
+                ? "Preview My Flow"
                 : savedRule
                   ? "Continue Draft"
                   : "Create My Rule"}
@@ -2187,17 +2174,15 @@ export default function Home() {
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
               <div className="section-tag">
-                Activity
+                My Flow
               </div>
 
               <h2 className="mt-5 text-4xl font-medium tracking-[-0.05em] sm:text-5xl">
-                Your StockFlow activity
+                Your rule. One simple view.
               </h2>
 
               <p className="mt-4 max-w-xl text-sm leading-7 text-white/40">
-                Your current allocation
-                and recent activity for
-                this connected wallet.
+                See how incoming USDC would be divided and what has happened recently.
               </p>
             </div>
 
@@ -2228,7 +2213,7 @@ export default function Home() {
               </p>
             </div>
           ) : (
-            <div className="mt-10 grid gap-4 lg:grid-cols-[0.95fr_1.4fr]">
+            <div className="mt-10 space-y-4">
               {/* CURRENT RULE */}
 
               <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-5">
@@ -2240,7 +2225,7 @@ export default function Home() {
                       }
                     />
 
-                    Current allocation
+                    My active flow
                   </div>
 
                   <span
@@ -2260,7 +2245,19 @@ export default function Home() {
 
                 {savedRule ? (
                   <>
-                    <div className="mt-6 space-y-2">
+                    <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/[0.05] bg-black/20 px-4 py-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.03] text-xs font-semibold">
+                        U
+                      </div>
+                      <div>
+                        <span className="block text-[9px] uppercase tracking-[0.12em] text-white/25">When I receive</span>
+                        <strong className="mt-1 block text-xs">USDC</strong>
+                      </div>
+                      <ArrowRight className="ml-auto text-white/20" size={16} />
+                      <span className="text-[10px] text-white/35">Follow my rule</span>
+                    </div>
+
+                    <div className="mt-3 space-y-2">
                       {savedRule.allocations
                         .filter(
                           (
@@ -2325,11 +2322,11 @@ export default function Home() {
                           ? openSimulator
                           : openBuilder
                       }
-                      className="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold text-white/60 transition hover:text-white"
+                      className="primary-button mt-5"
                     >
                       {isActive
-                        ? "Run allocation"
-                        : "Continue rule"}
+                        ? "Preview my flow"
+                        : "Finish my flow"}
 
                       <ArrowRight
                         size={
@@ -2341,18 +2338,16 @@ export default function Home() {
                 ) : (
                   <div className="mt-8">
                     <p className="text-xs leading-6 text-white/30">
-                      You have not created
-                      an allocation rule
-                      with this wallet yet.
+                      You do not have a flow yet. Create one rule for how incoming USDC should be divided.
                     </p>
 
                     <button
                       onClick={
                         openBuilder
                       }
-                      className="mt-4 inline-flex items-center gap-2 text-[10px] font-semibold text-white/60"
+                      className="primary-button mt-5"
                     >
-                      Create rule
+                      Create my flow
 
                       <ArrowRight
                         size={
@@ -2366,7 +2361,7 @@ export default function Home() {
 
               {/* RECENT ACTIVITY */}
 
-              <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-5">
+              <div className="rounded-[24px] border border-white/[0.05] bg-white/[0.012] p-5">
                 <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.12em] text-white/30">
                   <History
                     size={
@@ -2509,15 +2504,15 @@ export default function Home() {
               <div className="rule-builder-top">
                 <div>
                   <p className="rule-kicker">
-                    StockFlow automation
+                    Your flow
                   </p>
 
                   <h2>
                     {isActive
-                      ? "Manage active rule"
+                      ? "Edit my flow"
                       : savedRule
-                        ? "Continue investment rule"
-                        : "Create investment rule"}
+                        ? "Continue my flow"
+                        : "Create my flow"}
                   </h2>
                 </div>
 
@@ -2628,22 +2623,32 @@ export default function Home() {
                 2 && (
                 <div className="rule-step">
                   <p className="rule-step-label">
-                    Step 2
+                    Set your rule
                   </p>
 
                   <h3>
-                    Build your allocation
+                    Where should your money go?
                   </h3>
+
+                  <div className="mb-5 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/30">
+                      When money arrives
+                    </p>
+                    <div className="mt-2 flex items-center justify-between gap-4">
+                      <strong className="text-sm">USDC</strong>
+                      <span className="text-[10px] text-white/35">Follow this allocation</span>
+                    </div>
+                  </div>
 
                   <div className="allocation-summary">
                     <div>
                       <span>
-                        Invested
+                        Invest
                       </span>
 
                       <strong>
                         {
-                          totalInvested
+                          totalInvest
                         }
                         %
                       </strong>
@@ -2664,7 +2669,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {totalInvested >
+                  {totalInvest >
                     100 && (
                     <div className="allocation-error">
                       Allocations cannot
@@ -2777,34 +2782,24 @@ export default function Home() {
                         }
                       />
 
-                      Add another stock
+                      Add investment
                     </button>
                   )}
 
                   <div className="rule-footer">
                     <button
                       className="rule-secondary"
-                      onClick={() =>
-                        setStep(
-                          1
-                        )
-                      }
+                      onClick={() => setBuilderOpen(false)}
                     >
-                      <ArrowLeft
-                        size={
-                          16
-                        }
-                      />
-
-                      Back
+                      Cancel
                     </button>
 
                     <button
                       className="rule-primary"
                       disabled={
-                        totalInvested <=
+                        totalInvest <=
                           0 ||
-                        totalInvested >
+                        totalInvest >
                           100
                       }
                       onClick={() =>
@@ -2829,12 +2824,16 @@ export default function Home() {
                 3 && (
                 <div className="rule-step">
                   <p className="rule-step-label">
-                    Step 3
+                    Review
                   </p>
 
                   <h3>
-                    Review your rule
+                    Make sure this looks right
                   </h3>
+
+                  <p className="rule-step-description">
+                    Whenever USDC arrives, StockFlow will use this allocation.
+                  </p>
 
                   <div className="review-rule-card">
                     {allocations
@@ -2920,7 +2919,7 @@ export default function Home() {
                         >
                           {savingRule
                             ? "Saving..."
-                            : "Save Draft"}
+                            : "Save for later"}
                         </button>
                       )}
 
@@ -2937,8 +2936,8 @@ export default function Home() {
                         {activatingRule
                           ? "Activating..."
                           : isActive
-                            ? "Update Active Rule"
-                            : "Activate Rule"}
+                            ? "Update my flow"
+                            : "Activate my flow"}
 
                         <Zap
                           size={
@@ -3001,18 +3000,14 @@ export default function Home() {
                 <div className="rule-builder-top">
                   <div>
                     <p className="rule-kicker">
-                      StockFlow execution
+                      Preview flow
                     </p>
 
                     <h2>
-                      Run your allocation
+                      See where your money goes
                     </h2>
 
-                    <div className="simulation-demo-badge">
-                      <span />
-
-                      Solana Devnet
-                    </div>
+                    
                   </div>
 
                   <button
@@ -3031,10 +3026,7 @@ export default function Home() {
                 </div>
 
                 <p className="rule-step-description">
-                  Enter the incoming USDC
-                  amount to see how your
-                  active allocation will
-                  be distributed.
+                  Enter an incoming USDC amount and StockFlow will show exactly how your rule divides it.
                 </p>
 
                 {/* AMOUNT */}
@@ -3074,6 +3066,14 @@ export default function Home() {
                 </div>
 
                 {/* ALLOCATION */}
+
+                <div className="mt-7 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/25">Your preview</p>
+                    <h3 className="mt-1 text-sm font-semibold">Here is how your flow divides it</h3>
+                  </div>
+                  <span className="rounded-full border border-white/[0.06] bg-white/[0.025] px-3 py-1.5 text-[9px] text-white/35">No funds moved</span>
+                </div>
 
                 <div className="simulation-flow">
                   <div className="simulation-source">
@@ -3118,11 +3118,11 @@ export default function Home() {
                               {
                                 item.percentage
                               }
-                              % allocation
+                              % of incoming USDC
                             </span>
 
                             <span>
-                              Price:{" "}
+                              Estimated price:{" "}
                               {formatPrice(
                                 item.price
                               )}
@@ -3160,7 +3160,7 @@ export default function Home() {
                           </strong>
 
                           <span>
-                            Remaining balance
+                            Stays available
                           </span>
                         </div>
 
@@ -3187,19 +3187,15 @@ export default function Home() {
                           }
                         />
 
-                        Solana Devnet
+                        Demo verification
                       </div>
 
                       <h3 className="mt-2 text-[15px] font-semibold">
-                        Wallet execution
+                        Verify this preview on Devnet
                       </h3>
 
                       <p className="mt-1 max-w-md text-[10px] leading-5 text-white/35">
-                        Confirm the
-                        verification in your
-                        connected wallet to
-                        validate the
-                        allocation flow.
+                        Optional: confirm a Solana Devnet verification in your wallet. This demo records the preview; it does not purchase stocks or move investment funds.
                       </p>
                     </div>
 
@@ -3308,11 +3304,11 @@ export default function Home() {
                           className="animate-spin"
                         />
 
-                        Confirming...
+                        Verifying...
                       </>
                     ) : (
                       <>
-                        Run Devnet Test
+                        Verify preview
 
                         <ArrowRight
                           size={

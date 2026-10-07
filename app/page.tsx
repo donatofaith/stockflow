@@ -437,7 +437,7 @@ export default function Home() {
       walletAddress,
     ]);
 
-  const totalInvested =
+  const totalInvest =
     useMemo(() => {
       return allocations.reduce(
         (
@@ -454,7 +454,7 @@ export default function Home() {
 
   const remaining =
     100 -
-    totalInvested;
+    totalInvest;
 
   const isActive =
     savedRule?.status ===
@@ -1270,7 +1270,7 @@ export default function Home() {
       );
     }
 
-    setStep(1);
+    setStep(2);
 
     setBuilderOpen(
       true
@@ -1406,9 +1406,9 @@ export default function Home() {
     }
 
     if (
-      totalInvested <=
+      totalInvest <=
         0 ||
-      totalInvested >
+      totalInvest >
         100
     ) {
       setToast(
@@ -1516,9 +1516,9 @@ export default function Home() {
     }
 
     if (
-      totalInvested <=
+      totalInvest <=
         0 ||
-      totalInvested >
+      totalInvest >
         100
     ) {
       setToast(
@@ -2496,15 +2496,15 @@ export default function Home() {
               <div className="rule-builder-top">
                 <div>
                   <p className="rule-kicker">
-                    StockFlow automation
+                    Your flow
                   </p>
 
                   <h2>
                     {isActive
-                      ? "Manage active rule"
+                      ? "Edit my flow"
                       : savedRule
-                        ? "Continue investment rule"
-                        : "Create investment rule"}
+                        ? "Continue my flow"
+                        : "Create my flow"}
                   </h2>
                 </div>
 
@@ -2615,22 +2615,32 @@ export default function Home() {
                 2 && (
                 <div className="rule-step">
                   <p className="rule-step-label">
-                    Step 2
+                    Set your rule
                   </p>
 
                   <h3>
-                    Build your allocation
+                    Where should your money go?
                   </h3>
+
+                  <div className="mb-5 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/30">
+                      When money arrives
+                    </p>
+                    <div className="mt-2 flex items-center justify-between gap-4">
+                      <strong className="text-sm">USDC</strong>
+                      <span className="text-[10px] text-white/35">Follow this allocation</span>
+                    </div>
+                  </div>
 
                   <div className="allocation-summary">
                     <div>
                       <span>
-                        Invested
+                        Invest
                       </span>
 
                       <strong>
                         {
-                          totalInvested
+                          totalInvest
                         }
                         %
                       </strong>
@@ -2651,7 +2661,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {totalInvested >
+                  {totalInvest >
                     100 && (
                     <div className="allocation-error">
                       Allocations cannot
@@ -2764,34 +2774,24 @@ export default function Home() {
                         }
                       />
 
-                      Add another stock
+                      Add investment
                     </button>
                   )}
 
                   <div className="rule-footer">
                     <button
                       className="rule-secondary"
-                      onClick={() =>
-                        setStep(
-                          1
-                        )
-                      }
+                      onClick={() => setBuilderOpen(false)}
                     >
-                      <ArrowLeft
-                        size={
-                          16
-                        }
-                      />
-
-                      Back
+                      Cancel
                     </button>
 
                     <button
                       className="rule-primary"
                       disabled={
-                        totalInvested <=
+                        totalInvest <=
                           0 ||
-                        totalInvested >
+                        totalInvest >
                           100
                       }
                       onClick={() =>
@@ -2816,12 +2816,16 @@ export default function Home() {
                 3 && (
                 <div className="rule-step">
                   <p className="rule-step-label">
-                    Step 3
+                    Review
                   </p>
 
                   <h3>
-                    Review your rule
+                    Make sure this looks right
                   </h3>
+
+                  <p className="rule-step-description">
+                    Whenever USDC arrives, StockFlow will use this allocation.
+                  </p>
 
                   <div className="review-rule-card">
                     {allocations
@@ -2907,7 +2911,7 @@ export default function Home() {
                         >
                           {savingRule
                             ? "Saving..."
-                            : "Save Draft"}
+                            : "Save for later"}
                         </button>
                       )}
 
@@ -2924,8 +2928,8 @@ export default function Home() {
                         {activatingRule
                           ? "Activating..."
                           : isActive
-                            ? "Update Active Rule"
-                            : "Activate Rule"}
+                            ? "Update my flow"
+                            : "Activate my flow"}
 
                         <Zap
                           size={

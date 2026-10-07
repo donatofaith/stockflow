@@ -1920,6 +1920,39 @@ export default function Home() {
             )}
           </div>
 
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-xs text-white/35">
+            <span className="flex items-center gap-2">
+              <ShieldCheck
+                size={
+                  15
+                }
+              />
+
+              Non-custodial
+            </span>
+
+            <span className="flex items-center gap-2">
+              <WalletCards
+                size={
+                  15
+                }
+              />
+
+              Wallet-native
+            </span>
+
+            <span className="flex items-center gap-2">
+              <ChartNoAxesCombined
+                size={
+                  15
+                }
+              />
+
+              Automated allocations
+            </span>
+          </div>
+        </div>
+
       {/* LIVE XSTOCKS CARDS */}
 
       <section
@@ -1959,39 +1992,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-xs text-white/35">
-            <span className="flex items-center gap-2">
-              <ShieldCheck
-                size={
-                  15
-                }
-              />
-
-              Non-custodial
-            </span>
-
-            <span className="flex items-center gap-2">
-              <WalletCards
-                size={
-                  15
-                }
-              />
-
-              Wallet-native
-            </span>
-
-            <span className="flex items-center gap-2">
-              <ChartNoAxesCombined
-                size={
-                  15
-                }
-              />
-
-              Automated allocations
-            </span>
-          </div>
-        </div>
 
         {/* PRODUCT DEMO */}
 

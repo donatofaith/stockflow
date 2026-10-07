@@ -1920,40 +1920,43 @@ export default function Home() {
             )}
           </div>
 
-      {/* LIVE XSTOCKS STRIP */}
+      {/* LIVE XSTOCKS CARDS */}
 
       <section
         aria-label="Live supported xStocks"
-        className="market-strip mt-8 w-screen border-y border-white/[0.06] bg-black/25"
+        className="market-cards-shell mt-9 w-screen"
       >
-        <div className="mx-auto flex max-w-[1440px] items-center gap-6 px-5 py-5 md:px-10 lg:px-16">
-          <div className="market-strip-label shrink-0">
-            <span className="market-live-dot" />
-            Live xStocks
-          </div>
+        <div className="market-cards-viewport">
+          <div className="market-cards-track">
+            {scrollingMarkets.map((market, index) => (
+              <article
+                key={`${market.ticker}-${index}`}
+                className="market-card"
+                aria-hidden={index >= markets.length}
+              >
+                <div className="market-card-top">
+                  <div className="market-card-identity">
+                    <span className="market-card-mark">
+                      {market.name.charAt(0)}
+                    </span>
+                    <div>
+                      <strong>{market.name}</strong>
+                      <span>{market.ticker}</span>
+                    </div>
+                  </div>
 
-          <div className="market-strip-viewport">
-            <div className="market-strip-track">
-              {scrollingMarkets.map((market, index) => (
-                <div
-                  key={`${market.ticker}-${index}`}
-                  className="market-strip-item"
-                  aria-hidden={index >= markets.length}
-                >
-                  <span className="market-strip-ticker">{market.ticker}</span>
-                  <span className="market-strip-price">
-                    {market.price === null ? "Price unavailable" : formatPrice(market.price)}
+                  <span className="market-card-live">
+                    <span className="market-live-dot" />
+                    Live
                   </span>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {marketUpdatedAt && (
-            <span className="hidden shrink-0 text-[11px] font-medium text-white/30 xl:block">
-              Live prices
-            </span>
-          )}
+                <div className="market-card-price">
+                  {market.price === null ? "Price unavailable" : formatPrice(market.price)}
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 

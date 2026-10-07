@@ -460,17 +460,6 @@ export default function Home() {
     savedRule?.status ===
     "active";
 
-  const scrollingMarkets =
-    useMemo(
-      () => [
-        ...markets,
-        ...markets,
-      ],
-      [
-        markets,
-      ]
-    );
-
   const localStorageKey =
     useMemo(() => {
       if (!walletAddress) {
@@ -1781,14 +1770,7 @@ export default function Home() {
               href="#activity"
               className="nav-link"
             >
-              My flow
-            </a>
-
-            <a
-              href="#activity"
-              className="nav-link"
-            >
-              Activity
+              My Flow
             </a>
           </div>
 
@@ -2021,16 +2003,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 border-t border-white/[0.06] pt-5 sm:flex-row sm:items-center sm:justify-between">
-              <p className="max-w-lg text-xs leading-6 text-white/35">
-                You choose the rule. StockFlow shows exactly how each incoming amount would be divided before anything is confirmed.
-              </p>
 
-              <button onClick={openBuilder} className="primary-button shrink-0">
-                {connected ? "Create my flow" : "Connect & create"}
-                <ArrowRight size={16} />
-              </button>
-            </div>
           </div>
         </div>
       </section>
@@ -2045,119 +2018,43 @@ export default function Home() {
       >
         <div className="section-glow" />
 
-        <div className="relative z-10 mx-auto grid max-w-[1200px] items-center gap-16 lg:grid-cols-2">
-          <div>
-            <div className="section-tag">
-              How it works
-            </div>
+        <div className="relative z-10 mx-auto max-w-[1200px]">
+          <div className="max-w-2xl">
+            <div className="section-tag">How it works</div>
 
-            <h2 className="mt-6 max-w-xl text-4xl font-medium leading-[1.05] tracking-[-0.05em] sm:text-5xl lg:text-6xl">
-              Set your rule once.
-
-              <span className="block text-white/35">
-                Your money knows where to go.
-              </span>
+            <h2 className="mt-6 text-4xl font-medium leading-[1.05] tracking-[-0.05em] sm:text-5xl lg:text-6xl">
+              Three steps. One rule.
             </h2>
 
-            <p className="mt-6 max-w-lg text-sm leading-7 text-white/40 sm:text-base">
-              Choose your investments and percentages. When money arrives, your rule decides how it should be divided.
+            <p className="mt-6 max-w-xl text-sm leading-7 text-white/40 sm:text-base">
+              Set your allocation once, preview the split, and keep the rule connected to your wallet.
             </p>
           </div>
 
-          <div className="flow-card">
-            <div className="flow-top">
-              <span>
-                Investment Rule
-              </span>
-
-              <span className="flow-status">
-                {isActive
-                  ? "Active"
-                  : savedRule
-                    ? "Draft"
-                    : "Preview"}
-              </span>
-            </div>
-
-            <div className="mt-8 rounded-2xl border border-white/[0.07] bg-black/30 p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-white/30">
-                WHEN I RECEIVE
-              </p>
-
-              <p className="mt-2 font-medium">
-                USDC
+          <div className="mt-12 grid gap-4 md:grid-cols-3">
+            <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-6">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">01</span>
+              <h3 className="mt-5 text-lg font-semibold">Choose your split</h3>
+              <p className="mt-3 text-xs leading-6 text-white/35">
+                Pick supported xStocks, set percentages, and decide how much stays as USDC.
               </p>
             </div>
 
-            <div className="mt-5 space-y-3">
-              {(savedRule?.allocations ??
-                DEFAULT_ALLOCATIONS
-              ).map(
-                (
-                  allocation
-                ) => (
-                  <div
-                    key={
-                      allocation.ticker
-                    }
-                    className="allocation-row"
-                  >
-                    <span>
-                      {
-                        allocation.ticker
-                      }
-                    </span>
-
-                    <span className="text-white/45">
-                      {
-                        allocation.percentage
-                      }
-                      %
-                    </span>
-                  </div>
-                )
-              )}
-
-              <div className="allocation-row">
-                <span>
-                  Keep as USDC
-                </span>
-
-                <span className="text-white/45">
-                  {savedRule
-                    ? Math.max(
-                        100 -
-                          savedRule.allocations.reduce(
-                            (
-                              total,
-                              item
-                            ) =>
-                              total +
-                              item.percentage,
-                            0
-                          ),
-                        0
-                      )
-                    : 60}
-                  %
-                </span>
-              </div>
+            <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-6">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">02</span>
+              <h3 className="mt-5 text-lg font-semibold">Preview the result</h3>
+              <p className="mt-3 text-xs leading-6 text-white/35">
+                Enter an incoming amount and see the exact split before anything is confirmed.
+              </p>
             </div>
 
-            <button
-              onClick={
-                isActive
-                  ? openSimulator
-                  : openBuilder
-              }
-              className="mt-7 w-full rounded-2xl bg-white py-4 text-sm font-semibold text-black transition hover:bg-white/90"
-            >
-              {isActive
-                ? "Preview My Flow"
-                : savedRule
-                  ? "Continue Draft"
-                  : "Create My Rule"}
-            </button>
+            <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-6">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">03</span>
+              <h3 className="mt-5 text-lg font-semibold">Keep your flow</h3>
+              <p className="mt-3 text-xs leading-6 text-white/35">
+                Save the rule to your wallet profile and return to My Flow whenever you want to review it.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -2178,11 +2075,11 @@ export default function Home() {
               </div>
 
               <h2 className="mt-5 text-4xl font-medium tracking-[-0.05em] sm:text-5xl">
-                Your rule. One simple view.
+                Your saved rule, in one place.
               </h2>
 
               <p className="mt-4 max-w-xl text-sm leading-7 text-white/40">
-                See how incoming USDC would be divided and what has happened recently.
+                Review your saved allocation and recent demo activity.
               </p>
             </div>
 
@@ -2207,9 +2104,7 @@ export default function Home() {
               </h3>
 
               <p className="mx-auto mt-2 max-w-sm text-xs leading-6 text-white/30">
-                Your current allocation
-                and activity will appear
-                here.
+                Your saved flow appears here after you connect.
               </p>
             </div>
           ) : (

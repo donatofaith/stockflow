@@ -1749,12 +1749,12 @@ export default function Home() {
           }}
         />
 
-        <nav className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between px-5 py-6 md:px-10 lg:px-16">
+        <nav className="site-nav relative z-30 mx-auto flex w-full max-w-[1320px] items-center justify-between px-5 py-6 md:px-10">
           <a
             href="#"
             className="flex items-center gap-3"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-xl">
+            <div className="brand-mark flex h-10 w-10 items-center justify-center rounded-xl">
               <ChartNoAxesCombined
                 size={
                   20
@@ -1767,7 +1767,7 @@ export default function Home() {
             </span>
           </a>
 
-          <div className="hidden items-center gap-9 rounded-full border border-white/[0.08] bg-white/[0.025] px-7 py-3 text-sm text-white/60 backdrop-blur-xl lg:flex">
+          <div className="nav-capsule hidden items-center gap-9 px-7 py-3 text-sm text-white/60 lg:flex">
             <a
               href="#how"
               className="nav-link"
@@ -1799,14 +1799,14 @@ export default function Home() {
           </button>
         </nav>
 
-        <div className="relative z-20 mx-auto flex w-full max-w-[1440px] flex-col items-center px-5 pb-14 pt-20 text-center md:px-10 md:pt-24 lg:px-16 lg:pt-28">
+        <div className="hero-content relative z-20 mx-auto flex w-full max-w-[1320px] flex-col items-center px-5 pb-14 pt-20 text-center md:px-10 md:pt-24 lg:pt-28">
           <div className="launch-pill">
             <span className="launch-dot" />
 
             Built for Stocklana on Solana
           </div>
 
-          <h1 className="mt-8 max-w-[950px] text-[3.2rem] font-medium leading-[0.98] tracking-[-0.065em] sm:text-[4.4rem] md:text-[5.6rem] lg:text-[6.8rem]">
+          <h1 className="hero-heading mt-8 max-w-[1050px] text-[3.35rem] font-medium leading-[0.94] tracking-[-0.07em] sm:text-[4.6rem] md:text-[6rem] lg:text-[7.35rem]">
             Invest automatically.
 
             <span className="hero-title-gradient block">
@@ -1814,7 +1814,7 @@ export default function Home() {
             </span>
           </h1>
 
-          <p className="mt-7 max-w-[620px] text-[15px] leading-7 text-white/45 sm:text-base">
+          <p className="hero-copy mt-8 max-w-[610px] text-[15px] leading-7 text-white/50 sm:text-base">
             Decide once how your money should be invested. When USDC arrives, StockFlow follows your allocation rule.
           </p>
 
@@ -1920,7 +1920,7 @@ export default function Home() {
             )}
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-xs text-white/35">
+          <div className="trust-row mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs text-white/40">
             <span className="flex items-center gap-2">
               <ShieldCheck
                 size={
@@ -1957,7 +1957,7 @@ export default function Home() {
 
       <section
         aria-label="Live supported xStocks"
-        className="market-cards-shell mt-9 w-screen"
+        className="market-cards-shell mt-12 w-screen"
       >
         <div className="market-cards-viewport">
           <div className="market-cards-track">
@@ -1995,8 +1995,8 @@ export default function Home() {
 
         {/* PRODUCT DEMO */}
 
-        <div className="relative z-20 mx-auto w-full max-w-[980px] px-5 pb-20 pt-5 md:px-10">
-          <div className="overflow-hidden rounded-[30px] border border-white/[0.08] bg-white/[0.035] p-5 text-left shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7">
+        <div className="product-demo relative z-20 mx-auto w-full max-w-[1080px] px-5 pb-28 pt-14 md:px-10">
+          <div className="flow-showcase overflow-hidden p-5 text-left sm:p-8">
             <div className="flex flex-col gap-4 border-b border-white/[0.06] pb-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/30">
@@ -2063,7 +2063,7 @@ export default function Home() {
 
       <section
         id="how"
-        className="relative overflow-hidden border-t border-white/[0.04] px-5 py-24 md:px-10 lg:py-32"
+        className="how-section relative overflow-hidden px-5 py-28 md:px-10 lg:py-36"
       >
         <div className="section-glow" />
 
@@ -2080,8 +2080,8 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-3">
-            <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="steps-grid mt-14 grid gap-5 md:grid-cols-3">
+            <div className="step-card rounded-[28px] p-7">
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">01</span>
               <h3 className="mt-5 text-lg font-semibold">Choose your split</h3>
               <p className="mt-3 text-xs leading-6 text-white/35">
@@ -2089,7 +2089,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-6">
+            <div className="step-card rounded-[28px] p-7">
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">02</span>
               <h3 className="mt-5 text-lg font-semibold">Preview the result</h3>
               <p className="mt-3 text-xs leading-6 text-white/35">
@@ -2097,7 +2097,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-6">
+            <div className="step-card rounded-[28px] p-7">
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">03</span>
               <h3 className="mt-5 text-lg font-semibold">Keep your flow</h3>
               <p className="mt-3 text-xs leading-6 text-white/35">
@@ -2114,7 +2114,7 @@ export default function Home() {
 
       <section
         id="activity"
-        className="border-t border-white/[0.05] bg-[#080808] px-5 py-24 md:px-10"
+        className="my-flow-section px-5 py-28 md:px-10 lg:py-36"
       >
         <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">

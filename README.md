@@ -1,70 +1,83 @@
 # StockFlow
 
-**Automated tokenized-stock allocation on Solana.**
+**A simple allocation-rule prototype for tokenized stocks on Solana.**
 
-StockFlow lets a user connect a Solana wallet, create a reusable allocation rule for xStocks, simulate an incoming USDC deposit, and verify the flow safely on Solana Devnet.
+StockFlow lets you connect a Solana wallet, decide how incoming USDC should be divided across supported xStocks, save that rule, and preview the result before confirming an optional Solana Devnet verification.
 
 Built for **Stocklana on Solana**.
 
 [Live demo](https://stockflow-nine-indol.vercel.app) · [Architecture](docs/ARCHITECTURE.md) · [Security notes](SECURITY.md)
 
-## Product preview
+## What StockFlow does
 
-### Landing page
+StockFlow turns one allocation decision into a reusable wallet-linked flow:
 
-![StockFlow landing page](docs/images/stockflow-home.png)
+1. **Choose your split** — select supported xStocks, set percentages, and decide how much stays available as USDC.
+2. **Review your rule** — check that the allocation is exactly what you want to save.
+3. **Preview the result** — enter an example incoming USDC amount and see how the rule divides it.
+4. **Return to My Flow** — review the saved rule and recent demo activity from one place.
+5. **Optional Devnet verification** — record a verification memo on Solana Devnet.
 
-### Build and review an allocation rule
+The current prototype does **not** purchase stocks, move investment funds, or run autonomous trades.
 
-| Trigger | Allocation builder |
-| --- | --- |
-| ![Choose the USDC trigger](docs/images/stockflow-rule-trigger.png) | ![Build an xStocks allocation](docs/images/stockflow-allocation-builder.png) |
+## Product flow
 
-![Review the active allocation rule](docs/images/stockflow-rule-review.png)
+```text
+Connect wallet
+     ↓
+Create my flow
+     ↓
+Choose allocation
+     ↓
+Review + activate rule
+     ↓
+My Flow
+     ↓
+Preview an incoming USDC amount
+     ↓
+Optional Devnet verification
+```
 
-### Verify the flow on Solana Devnet
+## Demo walkthrough
 
-![StockFlow Devnet verification](docs/images/stockflow-devnet-test.png)
+1. Open the live demo.
+2. Connect a Solana wallet configured for Devnet.
+3. Select **Start Investing** / **Create my flow**.
+4. Choose the xStocks and percentages for the rule.
+5. Review the allocation and select **Activate my flow**.
+6. Open **My Flow** and select **Preview my flow**.
+7. Enter an example USDC amount to see the calculated split.
+8. Optionally select **Verify preview** and approve the Devnet wallet prompt.
 
-## The problem
+> Devnet verification writes a memo transaction for the demo. It does not execute stock purchases or move investment funds.
 
-Investors who regularly receive stablecoins must repeatedly decide what to buy and manually split every deposit. That process is slow, inconsistent, and difficult to verify before funds move.
+## Supported assets
 
-## The solution
+The prototype currently supports:
 
-StockFlow turns an investment preference into a wallet-linked allocation rule:
+- AAPLx — Apple
+- NVDAx — NVIDIA
+- TSLAx — Tesla
+- AMZNx — Amazon
+- MSFTx — Microsoft
+- METAx — Meta
+- NFLXx — Netflix
+- COINx — Coinbase
 
-1. Connect a Solana wallet.
-2. Choose supported xStocks and allocation percentages.
-3. Save a draft or activate the rule.
-4. Enter an incoming USDC amount to preview the split.
-5. Approve a Devnet verification transaction in the wallet.
-
-The prototype demonstrates the rule-building and verification experience without taking custody of funds.
-
-## Judge walkthrough
-
-1. Open the [live demo](https://stockflow-nine-indol.vercel.app).
-2. Connect a Solana wallet configured for **Devnet**.
-3. Select **Start Investing** and create an allocation.
-4. Save or activate the rule.
-5. Select **Test Rule**, enter a USDC amount, and review the calculated distribution.
-6. Run the Devnet test and approve the wallet prompt.
-7. Review the wallet-specific rule and recent activity on the page.
-
-> The Devnet action writes a verification memo. It does not execute stock purchases or move investment funds.
+Any percentage not assigned to an xStock remains available as USDC.
 
 ## Product features
 
 - Solana wallet connection through Wallet Adapter
 - Wallet-linked draft and active allocation rules
-- Eight supported xStocks: AAPLx, NVDAx, TSLAx, AMZNx, MSFTx, METAx, NFLXx, and COINx
-- Live price lookup with xStocks, Nasdaq, and Stooq fallbacks
-- USDC allocation simulator
-- Solana Devnet wallet verification
-- Local activity history and cached market prices
+- Eight supported xStocks
+- Live market-price lookup with fallback providers
+- USDC allocation preview
+- My Flow view for the saved rule and recent demo activity
+- Optional Solana Devnet verification
+- Cached market prices and local activity history
 - Jupiter route-preview API foundation
-- Responsive, animated product interface
+- Responsive interface
 
 ## Architecture
 
@@ -84,8 +97,8 @@ The browser owns the interactive wallet experience. Next.js route handlers proxy
 
 | Method | Route | Purpose |
 | --- | --- | --- |
-| `GET` | `/api/xstocks` | Returns the supported assets and normalized prices |
-| `POST` | `/api/jupiter-preview` | Checks USDC-to-xStock route availability without signing or submitting a transaction |
+| `GET` | `/api/xstocks` | Returns supported assets and normalized prices |
+| `POST` | `/api/jupiter-preview` | Checks route availability without signing or submitting a transaction |
 
 ## Tech stack
 
@@ -104,7 +117,7 @@ The browser owns the interactive wallet experience. Next.js route handlers proxy
 - Node.js 20+
 - npm
 - A Supabase project
-- A Solana wallet for the Devnet verification flow
+- A Solana wallet for the optional Devnet verification
 - A Jupiter API key for route previews
 
 ### Install
@@ -117,7 +130,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open `http://localhost:3000`.
 
 ### Environment variables
 
@@ -138,11 +151,12 @@ npm run build
 
 ## Prototype boundaries
 
-- Rule activation records a user preference; it does not run an autonomous trading service.
-- The wallet verification uses Solana Devnet and a memo transaction.
+- Activating a flow saves a user preference; it does not start autonomous trading.
+- Preview Flow is a calculation only; no investment funds are moved.
+- Devnet verification uses a Solana memo transaction.
 - Jupiter integration currently prepares route information only; signing and execution are disabled.
 - Market prices may be delayed or unavailable when third-party services are unreachable.
-- Production use requires signed wallet authentication and restrictive Supabase Row Level Security policies.
+- Production use would require additional authentication, security review, and restrictive Supabase Row Level Security policies.
 
 ## Author
 

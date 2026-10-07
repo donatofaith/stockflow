@@ -1962,79 +1962,74 @@ export default function Home() {
           </div>
         </div>
 
-        {/* MARKET TICKER */}
+        {/* PRODUCT DEMO */}
 
-        <div
-          id="markets"
-          className="relative z-20 w-full border-t border-white/[0.05] py-5"
-        >
-          <div className="market-marquee-wrapper">
-            <div className="market-marquee">
-              {scrollingMarkets.map(
-                (
-                  market,
-                  index
-                ) => (
-                  <div
-                    key={`${market.ticker}-${index}`}
-                    className="market-card market-card-scroll"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <div className="coin-icon">
-                            {market.ticker.slice(
-                              0,
-                              1
-                            )}
-                          </div>
+        <div className="relative z-20 mx-auto w-full max-w-[980px] px-5 pb-20 pt-5 md:px-10">
+          <div className="overflow-hidden rounded-[30px] border border-white/[0.08] bg-white/[0.035] p-5 text-left shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7">
+            <div className="flex flex-col gap-4 border-b border-white/[0.06] pb-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/30">
+                  Your flow
+                </p>
+                <h2 className="mt-2 text-lg font-semibold tracking-[-0.03em] sm:text-xl">
+                  When money arrives, follow my rule.
+                </h2>
+              </div>
 
-                          <div>
-                            <p className="text-sm font-medium">
-                              {
-                                market.name
-                              }
-                            </p>
+              <span className="w-fit rounded-full border border-emerald-400/10 bg-emerald-400/[0.06] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-emerald-300">
+                Example rule
+              </span>
+            </div>
 
-                            <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-white/30">
-                              {
-                                market.ticker
-                              }
-                            </p>
-                          </div>
-                        </div>
+            <div className="grid gap-3 py-5 sm:grid-cols-[1fr_auto_1.45fr] sm:items-center">
+              <div className="rounded-2xl border border-white/[0.07] bg-black/25 p-4">
+                <p className="text-[9px] uppercase tracking-[0.14em] text-white/30">
+                  When I receive
+                </p>
+                <div className="mt-3 flex items-baseline justify-between gap-3">
+                  <strong className="text-xl tracking-[-0.03em]">100</strong>
+                  <span className="text-xs font-medium text-white/45">USDC</span>
+                </div>
+              </div>
 
-                        <p className="mt-6 text-xl font-medium tracking-[-0.03em]">
-                          {formatPrice(
-                            market.price
-                          )}
-                        </p>
-                      </div>
+              <ArrowRight className="mx-auto rotate-90 text-white/20 sm:rotate-0" size={20} />
 
-                      <div className="market-change">
-                        {market.price ===
-                        null
-                          ? "..."
-                          : "LIVE"}
-                      </div>
-                    </div>
-
-                    <div className="mt-6 h-px w-full bg-white/[0.06]" />
-
-                    <div className="mt-3 flex justify-between text-[10px] text-white/25">
-                      <span>
-                        xSTOCKS PRICE
-                      </span>
-
-                      <span>
-                        {marketUpdatedAt
-                          ? "UPDATED"
-                          : "LOADING"}
-                      </span>
-                    </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-black/20 px-4 py-3">
+                  <div>
+                    <span className="block text-sm font-semibold">Apple</span>
+                    <span className="mt-0.5 block text-[9px] text-white/30">AAPLx</span>
                   </div>
-                )
-              )}
+                  <strong className="text-sm">50%</strong>
+                </div>
+
+                <div className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-black/20 px-4 py-3">
+                  <div>
+                    <span className="block text-sm font-semibold">NVIDIA</span>
+                    <span className="mt-0.5 block text-[9px] text-white/30">NVDAx</span>
+                  </div>
+                  <strong className="text-sm">30%</strong>
+                </div>
+
+                <div className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-black/20 px-4 py-3">
+                  <div>
+                    <span className="block text-sm font-semibold">Keep available</span>
+                    <span className="mt-0.5 block text-[9px] text-white/30">USDC</span>
+                  </div>
+                  <strong className="text-sm">20%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-white/[0.06] pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-lg text-xs leading-6 text-white/35">
+                You choose the rule. StockFlow shows exactly how each incoming amount would be divided before anything is confirmed.
+              </p>
+
+              <button onClick={openBuilder} className="primary-button shrink-0">
+                {connected ? "Create my flow" : "Connect & create"}
+                <ArrowRight size={16} />
+              </button>
             </div>
           </div>
         </div>

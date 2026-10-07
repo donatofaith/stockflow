@@ -3007,11 +3007,7 @@ export default function Home() {
                       See where your money goes
                     </h2>
 
-                    <div className="simulation-demo-badge">
-                      <span />
-
-                      Solana Devnet
-                    </div>
+                    
                   </div>
 
                   <button
@@ -3071,6 +3067,14 @@ export default function Home() {
 
                 {/* ALLOCATION */}
 
+                <div className="mt-7 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/25">Your preview</p>
+                    <h3 className="mt-1 text-sm font-semibold">Here is how your flow divides it</h3>
+                  </div>
+                  <span className="rounded-full border border-white/[0.06] bg-white/[0.025] px-3 py-1.5 text-[9px] text-white/35">No funds moved</span>
+                </div>
+
                 <div className="simulation-flow">
                   <div className="simulation-source">
                     <span>
@@ -3114,11 +3118,11 @@ export default function Home() {
                               {
                                 item.percentage
                               }
-                              % allocation
+                              % of incoming USDC
                             </span>
 
                             <span>
-                              Price:{" "}
+                              Estimated price:{" "}
                               {formatPrice(
                                 item.price
                               )}
@@ -3156,7 +3160,7 @@ export default function Home() {
                           </strong>
 
                           <span>
-                            Remaining balance
+                            Stays available
                           </span>
                         </div>
 
@@ -3183,19 +3187,15 @@ export default function Home() {
                           }
                         />
 
-                        Solana Devnet
+                        Demo verification
                       </div>
 
                       <h3 className="mt-2 text-[15px] font-semibold">
-                        Wallet execution
+                        Verify this preview on Devnet
                       </h3>
 
                       <p className="mt-1 max-w-md text-[10px] leading-5 text-white/35">
-                        Confirm the
-                        verification in your
-                        connected wallet to
-                        validate the
-                        allocation flow.
+                        Optional: confirm a Solana Devnet verification in your wallet. This demo records the preview; it does not purchase stocks or move investment funds.
                       </p>
                     </div>
 
@@ -3304,11 +3304,11 @@ export default function Home() {
                           className="animate-spin"
                         />
 
-                        Confirming...
+                        Verifying...
                       </>
                     ) : (
                       <>
-                        Run Devnet Test
+                        Verify preview
 
                         <ArrowRight
                           size={

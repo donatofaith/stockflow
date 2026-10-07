@@ -2592,3 +2592,95 @@ button {
     align-items: flex-start;
   }
 }
+
+/* =========================
+   LIVE XSTOCKS STRIP
+========================= */
+
+.market-strip {
+  position: relative;
+  overflow: hidden;
+}
+
+.market-strip-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.market-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #34d399;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.45);
+}
+
+.market-strip-viewport {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+
+.market-strip-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  animation: stockflow-market-scroll 42s linear infinite;
+  will-change: transform;
+}
+
+.market-strip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
+}
+
+.market-strip-ticker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.market-strip-price {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+@keyframes stockflow-market-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (hover: hover) {
+  .market-strip-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-strip-track {
+    animation: none;
+  }
+
+  .market-strip-viewport {
+    overflow-x: auto;
+    mask-image: none;
+  }
+}

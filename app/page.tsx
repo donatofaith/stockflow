@@ -1,5 +1,6 @@
 "use client";
 
+import { Buffer } from "buffer";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -18,7 +19,7 @@ import {
 import {
   useWalletModal,
   WalletMultiButton,
-} from "@solana/wallet-adapter-react-ui";
+} from "@/components/WalletAccess";
 
 import {
   Activity,
@@ -42,6 +43,8 @@ import {
   Zap,
 } from "lucide-react";
 
+import Dashboard from "@/components/Dashboard";
+
 import { supabase } from "@/lib/supabase";
 
 /* ======================================================
@@ -60,6 +63,7 @@ type Allocation = {
 };
 
 type SavedRule = {
+  storage?: "local" | "cloud";
   id?: string;
   wallet_address: string;
   trigger_type: string;
@@ -272,6 +276,13 @@ function getErrorMessage(error: unknown) {
 ====================================================== */
 
 export default function Home() {
+  const { publicKey } = useWallet();
+  return <HomeContent key={publicKey?.toBase58() ?? "disconnected"} />;
+}
+
+function HomeContent() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activityExpanded, setActivityExpanded] = useState(false);
   const { connection } =
     useConnection();
 
@@ -576,6 +587,7 @@ export default function Home() {
      EFFECTS
   ==================================================== */
 
+  /* eslint-disable react-hooks/set-state-in-effect -- Hydrate the prototype cache and wallet-linked state after mounting. */
   useEffect(() => {
     /*
       Hydrate the ticker immediately from the
@@ -635,6 +647,7 @@ export default function Home() {
     };
   }, []);
 
+  // Reload wallet-scoped prototype data only when the connected address changes.
   useEffect(() => {
     if (!walletAddress) {
       setSavedRule(null);
@@ -661,9 +674,8 @@ export default function Home() {
     loadActivity(
       walletAddress
     );
-  }, [
-    walletAddress,
-  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletAddress]);
 
   useEffect(() => {
     if (!toast) {
@@ -686,6 +698,8 @@ export default function Home() {
   }, [
     toast,
   ]);
+
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   /* ====================================================
      ACTIVITY
@@ -984,10 +998,7 @@ export default function Home() {
           ],
           programId:
             MEMO_PROGRAM_ID,
-          data:
-            new TextEncoder().encode(
-              memoText
-            ) as any,
+          data: Buffer.from(memoText, "utf8"),
         })
       );
 
@@ -1152,11 +1163,19 @@ export default function Home() {
   async function loadSavedRule(
     address: string
   ) {
-    setLoadingRule(
-      true
-    );
+    setLoadingRule(true);
 
     try {
+      const cached = window.localStorage.getItem(`stockflow-draft-${address}`);
+      if (cached) {
+        const local = JSON.parse(cached) as SavedRule;
+        if (local.storage === "local" && local.wallet_address === address && Array.isArray(local.allocations)) {
+          setSavedRule(local);
+          setAllocations(local.allocations);
+          return;
+        }
+      }
+      if (!supabase) throw new Error("Cloud storage is not configured.");
       const {
         data,
         error,
@@ -1398,6 +1417,21 @@ export default function Home() {
      SAVE DRAFT
   ==================================================== */
 
+  function saveLocalRule(status: "draft" | "active") {
+    if (!walletAddress) return;
+    const now = new Date().toISOString();
+    const rule: SavedRule = { wallet_address: walletAddress, trigger_type: "USDC_DEPOSIT", allocations, status, updated_at: now, activated_at: status === "active" ? now : null, storage: "local" };
+    try {
+      window.localStorage.setItem(`stockflow-draft-${walletAddress}`, JSON.stringify(rule));
+      setSavedRule(rule);
+      setBuilderOpen(false);
+      setToast("Saved in this browser. Cloud storage is unavailable.");
+      addActivity({ type: "rule", title: status === "active" ? "Allocation saved locally" : "Draft saved locally", description: "Browser-local rule; this does not start automated trades.", status: status === "active" ? "active" : "success" });
+    } catch {
+      setToast("Could not save your rule. Browser storage is unavailable.");
+    }
+  }
+
   async function saveDraft() {
     if (!walletAddress) {
       return;
@@ -1421,6 +1455,7 @@ export default function Home() {
     );
 
     try {
+      if (!supabase) throw new Error("Cloud storage is not configured.");
       const {
         data,
         error,
@@ -1494,9 +1529,7 @@ export default function Home() {
         error
       );
 
-      setToast(
-        "Could not save rule."
-      );
+      saveLocalRule("draft");
     } finally {
       setSavingRule(
         false
@@ -1534,6 +1567,7 @@ export default function Home() {
       new Date().toISOString();
 
     try {
+      if (!supabase) throw new Error("Cloud storage is not configured.");
       const {
         data,
         error,
@@ -1638,9 +1672,7 @@ export default function Home() {
         error
       );
 
-      setToast(
-        "Could not activate rule."
-      );
+      saveLocalRule("active");
     } finally {
       setActivatingRule(
         false
@@ -1658,7 +1690,7 @@ export default function Home() {
           HERO
       ================================================= */}
 
-      <section className="hero-section relative overflow-hidden">
+      <section id="home" className="hero-section relative overflow-hidden">
         <div className="hero-noise" />
 
         <div className="hero-grid animated-grid" />
@@ -1751,7 +1783,7 @@ export default function Home() {
 
         <nav className="site-nav relative z-30 mx-auto flex w-full max-w-[1320px] items-center justify-between px-5 py-6 md:px-10">
           <a
-            href="#"
+            href="#home"
             className="flex items-center gap-3"
           >
             <div className="brand-mark flex h-10 w-10 items-center justify-center rounded-xl">
@@ -1779,8 +1811,9 @@ export default function Home() {
               href="#activity"
               className="nav-link"
             >
-              My Flow
+              Dashboard
             </a>
+            <a href="#markets" className="nav-link">Markets</a>
           </div>
 
           <div className="hidden md:block">
@@ -1788,8 +1821,11 @@ export default function Home() {
           </div>
 
           <button
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] lg:hidden"
             aria-label="Menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => setMenuOpen(!menuOpen)}
           >
             <Menu
               size={
@@ -1798,6 +1834,12 @@ export default function Home() {
             />
           </button>
         </nav>
+        {menuOpen && <div id="mobile-navigation" className="mobile-navigation">
+          <a href="#activity" onClick={() => setMenuOpen(false)}>Dashboard</a>
+          <a href="#markets" onClick={() => setMenuOpen(false)}>Markets</a>
+          <a href="#how" onClick={() => setMenuOpen(false)}>How it works</a>
+          <WalletMultiButton />
+        </div>}
 
         <div className="hero-content relative z-20 mx-auto flex w-full max-w-[1320px] flex-col items-center px-5 pb-14 pt-20 text-center md:px-10 md:pt-24 lg:pt-28">
           <div className="launch-pill">
@@ -1807,15 +1849,15 @@ export default function Home() {
           </div>
 
           <h1 className="hero-heading mt-8 max-w-[1050px] text-[3.35rem] font-medium leading-[0.94] tracking-[-0.07em] sm:text-[4.6rem] md:text-[6rem] lg:text-[7.35rem]">
-            Invest automatically.
+            Plan your investments.
 
             <span className="hero-title-gradient block">
-              Your money follows your rules.
+              Your allocation. Your rules.
             </span>
           </h1>
 
           <p className="hero-copy mt-8 max-w-[610px] text-[15px] leading-7 text-white/50 sm:text-base">
-            Decide once how your money should be invested. When USDC arrives, StockFlow follows your allocation rule.
+            Choose how incoming USDC should be allocated across xStocks. Save your rule, preview the split, and verify it on Solana Devnet.
           </p>
 
           {connected && (
@@ -1878,7 +1920,7 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  Start Investing
+                  Create my flow
 
                   <ArrowRight
                     size={
@@ -1948,7 +1990,7 @@ export default function Home() {
                 }
               />
 
-              Automated allocations
+              Allocation planning
             </span>
           </div>
         </div>
@@ -1956,9 +1998,11 @@ export default function Home() {
       {/* LIVE XSTOCKS CARDS */}
 
       <section
+        id="markets"
         aria-label="Live supported xStocks"
         className="market-cards-shell mt-12 w-screen"
       >
+        <p className="market-timestamp">Supported xStocks · {marketUpdatedAt ? `Prices updated ${formatActivityTime(marketUpdatedAt)}` : "Prices loading or unavailable"}</p>
         <div className="market-cards-viewport">
           <div className="market-cards-track">
             {scrollingMarkets.map((market, index) => (
@@ -2124,11 +2168,11 @@ export default function Home() {
               </div>
 
               <h2 className="mt-5 text-4xl font-medium tracking-[-0.05em] sm:text-5xl">
-                Your saved rule, in one place.
+                Your investment workspace.
               </h2>
 
               <p className="mt-4 max-w-xl text-sm leading-7 text-white/40">
-                Review your saved allocation and recent demo activity.
+                Manage your allocation, inspect your wallet, and verify your flow on Devnet.
               </p>
             </div>
 
@@ -2139,6 +2183,7 @@ export default function Home() {
             )}
           </div>
 
+          <Dashboard key={walletAddress ?? "disconnected"} onCreate={openBuilder} onPreview={openSimulator} hasRule={!!savedRule} />
           {!connected ? (
             <div className="mt-10 rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-8 text-center">
               <History
@@ -2155,6 +2200,7 @@ export default function Home() {
               <p className="mx-auto mt-2 max-w-sm text-xs leading-6 text-white/30">
                 Your saved flow appears here after you connect.
               </p>
+              <button className="primary-button mt-5" onClick={() => setVisible(true)}>Connect wallet</button>
             </div>
           ) : (
             <div className="mt-10 space-y-4">
@@ -2169,7 +2215,7 @@ export default function Home() {
                       }
                     />
 
-                    My active flow
+                    My allocation rule
                   </div>
 
                   <span
@@ -2189,6 +2235,7 @@ export default function Home() {
 
                 {savedRule ? (
                   <>
+                    <p className="dashboard-caption mt-4">{savedRule.storage === "local" ? "Saved in this browser only · Not synced across devices" : "Cloud-backed allocation rule"}</p>
                     <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/[0.05] bg-black/20 px-4 py-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.03] text-xs font-semibold">
                         U
@@ -2278,6 +2325,7 @@ export default function Home() {
                         }
                       />
                     </button>
+                    <button className="secondary-button mt-5" onClick={openBuilder}>Edit allocation</button>
                   </>
                 ) : (
                   <div className="mt-8">
@@ -2331,7 +2379,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <div className="mt-5 space-y-3">
-                    {activityItems.map(
+                    {(activityExpanded ? activityItems : activityItems.slice(0, 3)).map(
                       (
                         item
                       ) => (
@@ -2391,6 +2439,7 @@ export default function Home() {
                     )}
                   </div>
                 )}
+                {activityItems.length > 3 && <button className="secondary-button mt-5" onClick={() => setActivityExpanded(!activityExpanded)}>{activityExpanded ? "Show less" : `Show all ${activityItems.length} actions`}</button>}
               </div>
             </div>
           )}

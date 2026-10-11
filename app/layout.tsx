@@ -4,12 +4,12 @@ import "./globals.css";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 import Providers from "./providers";
-import ActivityCollapseController from "./activity-collapse-controller";
+
 
 export const metadata: Metadata = {
   title: "StockFlow",
   description:
-    "Automated tokenized stock investing on Solana.",
+    "Wallet-linked xStock allocation planning and Devnet verification on Solana.",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>{children}</Providers>
-        <ActivityCollapseController />
+
       </body>
     </html>
   );

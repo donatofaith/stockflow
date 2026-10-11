@@ -87,20 +87,15 @@ function extractPrice(value: unknown, depth = 0): number | null {
 async function fetchWithTimeout(
   url: string,
   init: RequestInit = {},
-  timeoutMs = 6000
+  timeoutMs = 2000,
 ) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    return await fetch(url, {
-      ...init,
-      signal: controller.signal,
-      cache: "no-store",
-    });
-  } finally {
-    clearTimeout(timeout);
-  }
+  // Keep the deadline active while the provider body is parsed, not only
+  // until response headers arrive.
+  return fetch(url, {
+    ...init,
+    signal: AbortSignal.timeout(timeoutMs),
+    next: { revalidate: 120 },
+  });
 }
 
 async function fetchXStocksPrice(ticker: string) {
@@ -113,7 +108,7 @@ async function fetchXStocksPrice(ticker: string) {
             Accept: "application/json",
             "User-Agent": "StockFlow/1.0",
           },
-        }
+        },
       );
 
       if (!response.ok) continue;
@@ -139,7 +134,7 @@ async function fetchNasdaqPrice(symbol: string) {
   try {
     const response = await fetchWithTimeout(
       `https://api.nasdaq.com/api/quote/${encodeURIComponent(
-        symbol
+        symbol,
       )}/info?assetclass=stocks`,
       {
         headers: {
@@ -150,7 +145,7 @@ async function fetchNasdaqPrice(symbol: string) {
           Referer: "https://www.nasdaq.com/",
           Origin: "https://www.nasdaq.com",
         },
-      }
+      },
     );
 
     if (!response.ok) return null;
@@ -184,14 +179,14 @@ async function fetchStooqPrice(symbol: string) {
   try {
     const response = await fetchWithTimeout(
       `https://stooq.com/q/l/?s=${encodeURIComponent(
-        symbol.toLowerCase()
+        symbol.toLowerCase(),
       )}.us&f=sd2t2ohlcv&h&e=csv`,
       {
         headers: {
           Accept: "text/csv,text/plain,*/*",
           "User-Agent": "StockFlow/1.0",
         },
-      }
+      },
     );
 
     if (!response.ok) return null;
@@ -204,7 +199,7 @@ async function fetchStooqPrice(symbol: string) {
     const headers = lines[0].split(",");
     const values = lines[1].split(",");
     const closeIndex = headers.findIndex(
-      (header) => header.trim().toLowerCase() === "close"
+      (header) => header.trim().toLowerCase() === "close",
     );
 
     if (closeIndex < 0) return null;
@@ -237,33 +232,76 @@ async function fetchAssetPrice(ticker: string, underlying: string) {
   return null;
 }
 
-export async function GET() {
-  const results = await Promise.all(
-    ASSETS.map(async (asset) => {
-      const result = await fetchAssetPrice(
-        asset.ticker,
-        asset.underlying
-      );
+type QuotedAsset = {
+  name: string;
+  ticker: string;
+  price: number | null;
+  source: string | null;
+  updatedAt: string | null;
+};
+type MarketSnapshot = {
+  assets: QuotedAsset[];
+  updatedAt: string | null;
+  stale: boolean;
+};
+const FRESH_MS = 120_000;
+const RETRY_MS = 30_000;
+let cached: MarketSnapshot | null = null;
+let checkedAt = 0;
+let pending: Promise<MarketSnapshot> | null = null;
 
+async function refreshSnapshot(): Promise<MarketSnapshot> {
+  const assets = await Promise.all(
+    ASSETS.map(async (asset) => {
+      const result = await fetchAssetPrice(asset.ticker, asset.underlying);
+      const previous = cached?.assets.find(
+        (quote) => quote.ticker === asset.ticker,
+      );
       return {
         name: asset.name,
         ticker: asset.ticker,
-        price: result?.price ?? null,
-        source: result?.source ?? null,
+        price: result?.price ?? previous?.price ?? null,
+        source: result?.source ?? previous?.source ?? null,
+        updatedAt: result
+          ? new Date().toISOString()
+          : (previous?.updatedAt ?? null),
       };
-    })
+    }),
   );
+  const timestamp =
+    assets
+      .map((asset) => asset.updatedAt)
+      .filter((value): value is string => !!value)
+      .sort()
+      .at(-1) ?? null;
+  checkedAt = Date.now();
+  cached = {
+    assets,
+    updatedAt: timestamp,
+    stale: assets.some(
+      (asset) =>
+        !asset.updatedAt ||
+        Date.now() - Date.parse(asset.updatedAt) >= FRESH_MS,
+    ),
+  };
+  return cached;
+}
 
-  return NextResponse.json(
-    {
-      assets: results,
-      updatedAt: new Date().toISOString(),
+export async function GET() {
+  const ttl = cached?.stale ? RETRY_MS : FRESH_MS;
+  let snapshot: MarketSnapshot;
+  if (cached && Date.now() - checkedAt < ttl) snapshot = cached;
+  else {
+    // Concurrent requests in a warm instance share one refresh. Upstream fetches
+    // also use Next's persistent cache; the public response can be cached at the CDN.
+    pending ??= refreshSnapshot().finally(() => {
+      pending = null;
+    });
+    snapshot = await pending;
+  }
+  return NextResponse.json(snapshot, {
+    headers: {
+      "Cache-Control": `public, max-age=15, s-maxage=${snapshot.stale ? 30 : 120}, stale-while-revalidate=300`,
     },
-    {
-      headers: {
-        "Cache-Control":
-          "no-store, no-cache, must-revalidate, proxy-revalidate",
-      },
-    }
-  );
+  });
 }

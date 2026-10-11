@@ -140,6 +140,7 @@ The Supabase publishable key is intended for browser use. Never place a Supabase
 
 ```bash
 npm run lint
+npm test
 npm run build
 ```
 
@@ -165,7 +166,22 @@ See [COPYRIGHT.md](COPYRIGHT.md).
 - Phantom has an explicit adapter fallback. Jupiter and compatible wallets are discovered through Solana Wallet Standard.
 - On mobile, use **Open in Phantom**, or open the site from your wallet's app browser. The picker provides installation links when no wallet is detected.
 - Overview reads Devnet SOL and USDC balances automatically; Holdings reads SPL and Token-2022 token accounts; History links the ten most recent transactions to Solana Explorer.
-- Wallet data refreshes every 30 seconds and can be refreshed manually. All balances and transaction links are explicitly Devnet.
+- Wallet data refreshes every 60 seconds while the tab is visible and can be refreshed manually. All balances and transaction links are explicitly Devnet.
 - Create/edit allocation, save a draft, activate the allocation preference, preview the split, and optionally verify the preview using the existing Devnet memo flow.
 - When Supabase is unconfigured or rejects a save, rules are saved locally and labeled **Saved in this browser only**. Such rules remain local and are not automatically synced across devices.
 - Connecting a wallet does not authenticate ownership to Supabase. Existing cloud rule storage remains a prototype; production cloud writes require wallet authentication and ownership-enforcing RLS.
+
+
+## Lightweight interface and refresh behaviour
+
+The landing page is server-rendered and contains a static allocation illustration and market cards. Solana providers, wallet controls, cloud rules, and motion code are confined to `/dashboard`. Dashboard prefetching is disabled on landing links. The allocation builder and preview simulator load on demand.
+
+Market polling starts when the market section approaches the viewport, refreshes every two minutes, and pauses in hidden tabs. Both market and wallet polling wait for each request to complete before scheduling another. Dashboard wallet data refreshes once per minute, with a manual refresh control.
+
+The market API uses a two-minute upstream Next.js cache, a warm-instance snapshot and shared in-flight refresh, and CDN cache headers. Provider requests have two-second deadlines; unavailable quotes retain their last observed values and timestamps, with a stale status and a shorter retry cache. Serverless instance caches are ephemeral; CDN and upstream caching provide the broader reuse. Indicative prices can still be delayed and are not executable trade quotes.
+
+Run `npm test` to verify cache reuse, concurrent-request deduplication, outage timestamps, polling visibility, non-overlap, and cleanup.
+
+### Local bundle comparison
+
+Compared with `main` at `496e962`, production-build mobile Chromium checks loaded 464,048 bytes of uncompressed landing-page JavaScript instead of 1,313,621 bytes (64.7% less). Continuous landing-page animations dropped from seven to zero. Both runs used the same viewport, four-times CPU throttling, a mocked market response, and no connected wallet. This measures initial-route code and decorative motion, not live hosting latency or real provider reliability.

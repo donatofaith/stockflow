@@ -1,28 +1,19 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import "@solana/wallet-adapter-react-ui/styles.css";
-
-import Providers from "./providers";
-
-
 export const metadata: Metadata = {
-  title: "StockFlow",
+  title: "StockFlow — Your allocation. Your rules.",
   description:
-    "Wallet-linked xStock allocation planning and Devnet verification on Solana.",
+    "Build a wallet-linked xStock allocation, preview your USDC split, and verify your flow on Solana Devnet.",
 };
-
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body>
-        <Providers>{children}</Providers>
-
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

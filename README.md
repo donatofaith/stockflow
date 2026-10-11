@@ -158,3 +158,14 @@ Built by **Faith Oluwalana**.
 ## License
 
 See [COPYRIGHT.md](COPYRIGHT.md).
+
+## Wallet access and dashboard
+
+- Select **Dashboard** to manage your allocation and inspect your connected wallet.
+- Phantom has an explicit adapter fallback. Jupiter and compatible wallets are discovered through Solana Wallet Standard.
+- On mobile, use **Open in Phantom**, or open the site from your wallet's app browser. The picker provides installation links when no wallet is detected.
+- Overview reads Devnet SOL and USDC balances automatically; Holdings reads SPL and Token-2022 token accounts; History links the ten most recent transactions to Solana Explorer.
+- Wallet data refreshes every 30 seconds and can be refreshed manually. All balances and transaction links are explicitly Devnet.
+- Create/edit allocation, save a draft, activate the allocation preference, preview the split, and optionally verify the preview using the existing Devnet memo flow.
+- When Supabase is unconfigured or rejects a save, rules are saved locally and labeled **Saved in this browser only**. Such rules remain local and are not automatically synced across devices.
+- Connecting a wallet does not authenticate ownership to Supabase. Existing cloud rule storage remains a prototype; production cloud writes require wallet authentication and ownership-enforcing RLS.

@@ -1,27 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { clusterApiUrl } from "@solana/web3.js";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
+import { WalletAccessProvider } from "@/components/WalletAccess";
+
+const subscribe = () => () => {};
 
 export default function Providers({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
+  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
   const endpoint = useMemo(() => {
     return clusterApiUrl("devnet");
   }, []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted) {
     return (
@@ -36,10 +37,10 @@ export default function Providers({
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={[]} autoConnect>
-        <WalletModalProvider>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletAccessProvider>
           {children}
-        </WalletModalProvider>
+        </WalletAccessProvider>
       </WalletProvider>
     </ConnectionProvider>
   );
